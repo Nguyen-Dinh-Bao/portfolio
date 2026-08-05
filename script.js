@@ -191,115 +191,87 @@ function showToast(message) {
 }
 
 
-
-/* Version 2.1 — online Account/Profile */
-const SUPABASE_URL = "https://fwskrzmivcwauleualio.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_mQpBQfiOkIJNjy4qeqBX4w_7xmnJPhO";
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+/* Version 1.2 — editable Account profile */
+const defaultAccount = {
+  username: "Nguyen Dinh Bao",
+  password: "",
+  email: "your-email@gmail.com",
+  bio: "Student · Learner · Creator"
+};
 
 const accountUsername = document.getElementById("accountUsername");
 const accountPassword = document.getElementById("accountPassword");
 const accountEmail = document.getElementById("accountEmail");
 const accountBio = document.getElementById("accountBio");
 const accountNamePreview = document.getElementById("accountNamePreview");
-const accountAvatar = document.getElementById("accountAvatar");
-const accountStatus = document.getElementById("accountStatus");
-const accountStatusText = document.getElementById("accountStatusText");
 const saveAccount = document.getElementById("saveAccount");
 const resetAccount = document.getElementById("resetAccount");
 const passwordToggle = document.getElementById("passwordToggle");
-const changeAvatar = document.getElementById("changeAvatar");
-const avatarInput = document.getElementById("avatarInput");
-const signOutButton = document.getElementById("signOutButton");
 
-async function getSession() {
-  const { data } = await supabaseClient.auth.getSession();
-  return data.session;
+function getAccountData() {
+  try {
+    return { ...defaultAccount, ...(JSON.parse(localStorage.getItem("bao-account")) || {}) };
+  } catch {
+    return { ...defaultAccount };
+  }
 }
-async function getCurrentProfile() {
-  const session = await getSession();
-  if (!session) return null;
-  const { data, error } = await supabaseClient.from("profiles")
-    .select("id,username,email,bio,avatar_url").eq("id", session.user.id).maybeSingle();
-  if (error) { console.error(error); return null; }
-  return data;
+
+function renderAccount() {
+  const data = getAccountData();
+  accountUsername.value = data.username || "";
+  accountPassword.value = data.password || "";
+  accountEmail.value = data.email || "";
+  accountBio.value = data.bio || "";
+  accountNamePreview.textContent = data.username || "Nguyen Dinh Bao";
 }
-function renderSignedInAccount(profile) {
-  if (!profile) {
-    accountUsername.value = "";
-    accountPassword.value = "";
-    accountEmail.value = "";
-    accountBio.value = "";
-    accountNamePreview.textContent = "Not signed in";
-    accountAvatar.src = "assets/profile.jpg";
-    accountStatus?.classList.remove("signed-in");
-    if (accountStatusText) accountStatusText.textContent = "Chưa đăng nhập";
-    if (signOutButton) signOutButton.disabled = true;
+
+renderAccount();
+
+saveAccount.addEventListener("click", () => {
+  const username = accountUsername.value.trim();
+  const email = accountEmail.value.trim();
+  const bio = accountBio.value.trim();
+
+  if (username.length < 2) {
+    showToast("Username phải có ít nhất 2 ký tự.");
+    accountUsername.focus();
     return;
   }
-  accountUsername.value = profile.username || "";
-  accountPassword.value = "";
-  accountEmail.value = profile.email || "";
-  accountBio.value = profile.bio || "";
-  accountNamePreview.textContent = profile.username || "Account";
-  accountAvatar.src = profile.avatar_url || "assets/profile.jpg";
-  accountStatus?.classList.add("signed-in");
-  if (accountStatusText) accountStatusText.textContent = `Đã đăng nhập · ${profile.username}`;
-  if (signOutButton) signOutButton.disabled = false;
-}
-async function refreshAccountUI() {
-  const profile = await getCurrentProfile();
-  const avatarBtn = document.getElementById("userAvatarButton");
-  const authBtn = document.getElementById("authButton");
-  const navAvatar = document.getElementById("navAvatar");
-  if (!profile) {
-    authBtn.hidden=false; avatarBtn.hidden=true;
-    renderSignedInAccount(null); return;
+
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showToast("Gmail chưa đúng định dạng.");
+    accountEmail.focus();
+    return;
   }
-  authBtn.hidden=true; avatarBtn.hidden=false;
-  navAvatar.src=profile.avatar_url || "assets/profile.jpg";
-  renderSignedInAccount(profile);
-}
-saveAccount?.addEventListener("click", async () => {
-  const session=await getSession();
-  if (!session) return showAuthToast("Hãy đăng nhập trước khi chỉnh sửa Account.","error");
-  const username=accountUsername.value.trim(), email=accountEmail.value.trim(), bio=accountBio.value.trim(), pw=accountPassword.value;
-  if (!/^[A-Za-z0-9_.-]{3,30}$/.test(username)) return showAuthToast("Username không hợp lệ.","error");
-  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showAuthToast("Gmail chưa đúng định dạng.","error");
-  if (pw && pw.length<6) return showAuthToast("Password phải có ít nhất 6 ký tự.","error");
-  const {data: dup,error:dupErr}=await supabaseClient.from("profiles").select("id").eq("username",username).neq("id",session.user.id).maybeSingle();
-  if (dupErr) return showAuthToast("Không thể kiểm tra Username.","error");
-  if (dup) return showAuthToast("Username đã được sử dụng","error");
-  const {data: updated,error}=await supabaseClient.from("profiles").update({username,email,bio}).eq("id",session.user.id).select("id,username,email,bio,avatar_url").single();
-  if (error) { console.error(error); return showAuthToast("Không thể lưu thông tin Account.","error"); }
-  if (pw) {
-    const {error:pe}=await supabaseClient.auth.updateUser({password:pw});
-    if (pe) return showAuthToast("Thông tin đã lưu nhưng Password chưa cập nhật.","error");
-  }
-  renderSignedInAccount(updated); await refreshAccountUI();
-  showAuthToast("Đã đồng bộ Account online.","success");
+
+  const data = {
+    username,
+    password: accountPassword.value,
+    email,
+    bio
+  };
+
+  localStorage.setItem("bao-account", JSON.stringify(data));
+  accountNamePreview.textContent = username;
+  showToast("Đã lưu thông tin tài khoản trên thiết bị này.");
 });
-resetAccount?.addEventListener("click",async()=>{renderSignedInAccount(await getCurrentProfile());});
-passwordToggle?.addEventListener("click",()=>{const h=accountPassword.type==="password";accountPassword.type=h?"text":"password";passwordToggle.textContent=h?"○":"◉";});
-changeAvatar?.addEventListener("click",async()=>{if(await getSession()) avatarInput.click();else showAuthToast("Hãy đăng nhập trước.","error");});
-avatarInput?.addEventListener("change",async()=>{
-  const f=avatarInput.files?.[0], s=await getSession(); if(!f||!s)return;
-  if(!f.type.startsWith("image/")) return showAuthToast("Vui lòng chọn file ảnh.","error");
-  if(f.size>2*1024*1024)return showAuthToast("Ảnh nên nhỏ hơn 2 MB.","error");
-  const ext=f.name.split(".").pop().toLowerCase()||"jpg", path=`${s.user.id}/avatar.${ext}`;
-  const {error:ue}=await supabaseClient.storage.from("avatars").upload(path,f,{upsert:true,contentType:f.type,cacheControl:"3600"});
-  if(ue){console.error(ue);return showAuthToast("Upload avatar thất bại. Kiểm tra Storage policy.","error");}
-  const {data:pd}=supabaseClient.storage.from("avatars").getPublicUrl(path);
-  const avatarUrl=pd.publicUrl+"?t="+Date.now();
-  const {data:updated,error}=await supabaseClient.from("profiles").update({avatar_url:avatarUrl}).eq("id",s.user.id).select("id,username,email,bio,avatar_url").single();
-  if(error)return showAuthToast("Không thể lưu avatar.","error");
-  renderSignedInAccount(updated); await refreshAccountUI(); showAuthToast("Đã cập nhật ảnh đại diện.","success"); avatarInput.value="";
+
+resetAccount.addEventListener("click", () => {
+  if (!confirm("Khôi phục thông tin Account về mặc định?")) return;
+
+  localStorage.removeItem("bao-account");
+  renderAccount();
+  showToast("Đã khôi phục thông tin.");
 });
-signOutButton?.addEventListener("click",async()=>{
-  const {error}=await supabaseClient.auth.signOut();
-  if(error)return showAuthToast("Đăng xuất thất bại.","error");
-  await refreshAccountUI(); goHome(); showAuthToast("Bạn đã đăng xuất.","success");
+
+passwordToggle.addEventListener("click", () => {
+  const hidden = accountPassword.type === "password";
+  accountPassword.type = hidden ? "text" : "password";
+  passwordToggle.setAttribute("aria-label", hidden ? "Hide password" : "Show password");
+  passwordToggle.textContent = hidden ? "○" : "◉";
 });
+
+
 /* Version 1.3 — editable About Me cards */
 const defaultInfoCards = [
   {
@@ -468,75 +440,226 @@ addInfoCard.addEventListener("click", () => {
 renderInfoCards();
 
 
+/* Version 1.4 — Sign In / Sign Up local demo */
+const AUTH_USERS_KEY = "bao-auth-users";
+const CURRENT_USER_KEY = "bao-current-user";
 
-/* Version 2.1 — online Sign In / Sign Up */
-const authModal=document.getElementById("authModal");
-const authButton=document.getElementById("authButton");
-const userAvatarButton=document.getElementById("userAvatarButton");
-const navAvatar=document.getElementById("navAvatar");
-const closeAuthModal=document.getElementById("closeAuthModal");
-const signInTab=document.getElementById("signInTab");
-const signUpTab=document.getElementById("signUpTab");
-const authTitle=document.getElementById("authTitle");
-const authForm=document.getElementById("authForm");
-const authIdentity=document.getElementById("authIdentity");
-const authPassword=document.getElementById("authPassword");
-const authPasswordToggle=document.getElementById("authPasswordToggle");
-const authSubmit=document.getElementById("authSubmit");
-const authIdentityLabel=document.getElementById("authIdentityLabel");
-const authHint=document.getElementById("authHint");
-let authMode="signin";
+const authModal = document.getElementById("authModal");
+const authButton = document.getElementById("authButton");
+const userAvatarButton = document.getElementById("userAvatarButton");
+const navAvatar = document.getElementById("navAvatar");
+const closeAuthModal = document.getElementById("closeAuthModal");
+const signInTab = document.getElementById("signInTab");
+const signUpTab = document.getElementById("signUpTab");
+const authTitle = document.getElementById("authTitle");
+const authForm = document.getElementById("authForm");
+const authIdentity = document.getElementById("authIdentity");
+const authPassword = document.getElementById("authPassword");
+const authPasswordToggle = document.getElementById("authPasswordToggle");
+const authSubmit = document.getElementById("authSubmit");
+const authIdentityLabel = document.getElementById("authIdentityLabel");
+const authHint = document.getElementById("authHint");
 
-function setAuthMode(mode){
-  authMode=mode; const signup=mode==="signup";
-  signInTab.classList.toggle("active",!signup); signUpTab.classList.toggle("active",signup);
-  authTitle.textContent=signup?"Sign Up":"Sign In";
-  authSubmit.innerHTML=signup?'Đăng Kí <span>↗</span>':'Sign In <span>↗</span>';
-  authIdentityLabel.textContent=signup?"Username":"Username hoặc Gmail";
-  authIdentity.placeholder=signup?"Username":"Username hoặc Gmail";
-  authHint.textContent=signup?"Username 3–30 ký tự. Gmail sẽ được dùng cho tài khoản Supabase.":"Đăng nhập bằng Username hoặc Gmail.";
-  authIdentity.value="";authPassword.value="";authPassword.type="password";authPasswordToggle.textContent="◉";
+let authMode = "signin";
+
+function getUsers() {
+  try {
+    const users = JSON.parse(localStorage.getItem(AUTH_USERS_KEY));
+    return Array.isArray(users) ? users : [];
+  } catch {
+    return [];
+  }
 }
-function openAuth(mode="signin"){setAuthMode(mode);authModal.classList.add("open");authModal.setAttribute("aria-hidden","false");setTimeout(()=>authIdentity.focus(),50);}
-function closeAuth(){authModal.classList.remove("open");authModal.setAttribute("aria-hidden","true");}
-authButton.addEventListener("click",()=>openAuth("signin"));
-userAvatarButton.addEventListener("click",()=>document.querySelector('[data-target="settings"]')?.click());
-closeAuthModal.addEventListener("click",closeAuth);
-authModal.addEventListener("click",e=>{if(e.target===authModal)closeAuth();});
-signInTab.addEventListener("click",()=>setAuthMode("signin"));
-signUpTab.addEventListener("click",()=>setAuthMode("signup"));
-authPasswordToggle.addEventListener("click",()=>{const h=authPassword.type==="password";authPassword.type=h?"text":"password";authPasswordToggle.textContent=h?"○":"◉";});
 
-authForm.addEventListener("submit",async e=>{
-  e.preventDefault();
-  const identity=authIdentity.value.trim(), password=authPassword.value;
-  if(authMode==="signup"){
-    if(!/^[A-Za-z0-9_.-]{3,30}$/.test(identity))return showAuthToast("Username không hợp lệ.","error");
-    if(password.length<6)return showAuthToast("Password phải có ít nhất 6 ký tự.","error");
-    const email=prompt("Nhập Gmail để tạo tài khoản:");
-    if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()))return showAuthToast("Gmail chưa đúng định dạng.","error");
-    const {data,error}=await supabaseClient.auth.signUp({email:email.trim(),password,options:{data:{username:identity}}});
-    if(error)return showAuthToast(error.message.toLowerCase().includes("already")?"Email đã được sử dụng.":error.message,"error");
-    if(!data.user)return showAuthToast("Không thể tạo tài khoản.","error");
-    const {data:profile,error:pe}=await supabaseClient.from("profiles").insert({id:data.user.id,username:identity,email:email.trim(),bio:""}).select("id,username,email,bio,avatar_url").single();
-    if(pe){console.error(pe);return showAuthToast("Tài khoản Auth đã tạo nhưng profile chưa tạo. Kiểm tra RLS.","error");}
+function saveUsers(users) {
+  localStorage.setItem(AUTH_USERS_KEY, JSON.stringify(users));
+}
+
+function getCurrentUser() {
+  try {
+    return JSON.parse(localStorage.getItem(CURRENT_USER_KEY));
+  } catch {
+    return null;
+  }
+}
+
+function setCurrentUser(user) {
+  if (user) localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+  else localStorage.removeItem(CURRENT_USER_KEY);
+  updateAuthUI();
+}
+
+function showAuthToast(message, type = "success") {
+  const toast = document.createElement("div");
+  toast.className = `auth-toast ${type}`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  requestAnimationFrame(() => toast.classList.add("show"));
+  setTimeout(() => {
+    toast.classList.remove("show");
+    setTimeout(() => toast.remove(), 250);
+  }, 2800);
+}
+
+function setAuthMode(mode) {
+  authMode = mode;
+  const signup = mode === "signup";
+
+  signInTab.classList.toggle("active", !signup);
+  signUpTab.classList.toggle("active", signup);
+  authTitle.textContent = signup ? "Sign Up" : "Sign In";
+  authSubmit.innerHTML = signup ? 'Đăng Kí <span>↗</span>' : 'Sign In <span>↗</span>';
+  authIdentityLabel.textContent = signup ? "Username" : "Username hoặc Gmail";
+  authIdentity.placeholder = signup ? "Username" : "Username hoặc Gmail";
+  authPassword.autocomplete = signup ? "new-password" : "current-password";
+  authHint.textContent = signup
+    ? "Username phải có ít nhất 3 ký tự và không được trùng với tài khoản đã đăng ký."
+    : "Đăng nhập bằng Username hoặc Gmail đã lưu trong tài khoản.";
+
+  authIdentity.value = "";
+  authPassword.value = "";
+  authPassword.type = "password";
+  authPasswordToggle.textContent = "◉";
+}
+
+function openAuth(mode = "signin") {
+  setAuthMode(mode);
+  authModal.classList.add("open");
+  authModal.setAttribute("aria-hidden", "false");
+  setTimeout(() => authIdentity.focus(), 50);
+}
+
+function closeAuth() {
+  authModal.classList.remove("open");
+  authModal.setAttribute("aria-hidden", "true");
+}
+
+authButton.addEventListener("click", () => openAuth("signin"));
+userAvatarButton.addEventListener("click", () => {
+  const settingsLink = document.querySelector('[data-target="settings"]');
+  if (settingsLink) settingsLink.click();
+});
+
+closeAuthModal.addEventListener("click", closeAuth);
+authModal.addEventListener("click", event => {
+  if (event.target === authModal) closeAuth();
+});
+
+signInTab.addEventListener("click", () => setAuthMode("signin"));
+signUpTab.addEventListener("click", () => setAuthMode("signup"));
+
+authPasswordToggle.addEventListener("click", () => {
+  const hidden = authPassword.type === "password";
+  authPassword.type = hidden ? "text" : "password";
+  authPasswordToggle.textContent = hidden ? "○" : "◉";
+});
+
+authForm.addEventListener("submit", event => {
+  event.preventDefault();
+
+  const identity = authIdentity.value.trim();
+  const password = authPassword.value;
+
+  if (authMode === "signup") {
+    if (!/^[A-Za-z0-9_.-]{3,30}$/.test(identity)) {
+      showAuthToast("Username không hợp lệ. Dùng 3–30 ký tự chữ, số, ., _, -.", "error");
+      return;
+    }
+
+    if (password.length < 6) {
+      showAuthToast("Password phải có ít nhất 6 ký tự.", "error");
+      return;
+    }
+
+    const users = getUsers();
+    const exists = users.some(user => user.username.toLowerCase() === identity.toLowerCase());
+
+    if (exists) {
+      showAuthToast("Username đã được sử dụng", "error");
+      return;
+    }
+
+    const newUser = {
+      id: `user-${Date.now()}`,
+      username: identity,
+      password,
+      email: "",
+      bio: "",
+      avatar: ""
+    };
+
+    users.push(newUser);
+    saveUsers(users);
+    setCurrentUser(newUser);
     closeAuth();
-    if(data.session){await refreshAccountUI();goHome();showAuthToast("Bạn đã đăng kí thành công.","success");}
-    else showAuthToast("Đăng kí thành công. Hãy xác nhận Gmail rồi đăng nhập.","success");
+    showAuthToast("Bạn đã đăng kí thành công.", "success");
+    goHome();
     return;
   }
-  let email=identity;
-  if(!identity.includes("@")){
-    const {data,error}=await supabaseClient.from("profiles").select("email").eq("username",identity).maybeSingle();
-    if(error||!data?.email)return showAuthToast("Thông tin đăng nhập chưa chính xác","error");
-    email=data.email;
+
+  const users = getUsers();
+  const match = users.find(user =>
+    user.username.toLowerCase() === identity.toLowerCase() ||
+    (user.email && user.email.toLowerCase() === identity.toLowerCase())
+  );
+
+  if (!match || match.password !== password) {
+    showAuthToast("Thông tin đăng nhập chưa chính xác", "error");
+    return;
   }
-  const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
-  if(error||!data.session)return showAuthToast("Thông tin đăng nhập chưa chính xác","error");
-  closeAuth();await refreshAccountUI();goHome();showAuthToast("Bạn đã đăng nhập thành công","success");
+
+  setCurrentUser(match);
+  closeAuth();
+  showAuthToast("Bạn đã đăng nhập thành công", "success");
+  goHome();
 });
-function updateAuthUI(){refreshAccountUI();}
-(async()=>{
-  supabaseClient.auth.onAuthStateChange(()=>{setTimeout(refreshAccountUI,0);});
-  await refreshAccountUI();
+
+function goHome() {
+  const aboutLink = document.querySelector('[data-target="about"]');
+  if (aboutLink) aboutLink.click();
+  else window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function updateAuthUI() {
+  const user = getCurrentUser();
+
+  if (!user) {
+    authButton.hidden = false;
+    userAvatarButton.hidden = true;
+    return;
+  }
+
+  authButton.hidden = true;
+  userAvatarButton.hidden = false;
+
+  navAvatar.src = user.avatar || "assets/profile.jpg";
+  navAvatar.onerror = () => {
+    navAvatar.src = "https://placehold.co/100x100/f0f0ec/777?text=K";
+  };
+}
+
+updateAuthUI();
+
+
+/* Version 1.4.1 — robust auth button fallback */
+(function ensureAuthControls() {
+  const button = document.getElementById("authButton");
+  const avatarButton = document.getElementById("userAvatarButton");
+
+  if (!button) return;
+
+  button.hidden = false;
+  button.style.display = "inline-flex";
+
+  button.addEventListener("click", () => {
+    if (typeof openAuth === "function") openAuth("signin");
+  });
+
+  if (avatarButton) {
+    avatarButton.addEventListener("click", () => {
+      const settingsLink = document.querySelector('[data-target="settings"]');
+      if (settingsLink) settingsLink.click();
+    });
+  }
 })();
