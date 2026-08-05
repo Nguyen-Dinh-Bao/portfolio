@@ -202,7 +202,6 @@ const accountPassword = document.getElementById("accountPassword");
 const accountEmail = document.getElementById("accountEmail");
 const accountBio = document.getElementById("accountBio");
 const accountNamePreview = document.getElementById("accountNamePreview");
-const accountAvatar = document.getElementById("accountAvatar");
 const accountStatus = document.getElementById("accountStatus");
 const accountStatusText = document.getElementById("accountStatusText");
 const saveAccount = document.getElementById("saveAccount");
