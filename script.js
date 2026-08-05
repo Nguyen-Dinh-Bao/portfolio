@@ -640,3 +640,26 @@ function updateAuthUI() {
 }
 
 updateAuthUI();
+
+
+/* Version 1.4.1 — robust auth button fallback */
+(function ensureAuthControls() {
+  const button = document.getElementById("authButton");
+  const avatarButton = document.getElementById("userAvatarButton");
+
+  if (!button) return;
+
+  button.hidden = false;
+  button.style.display = "inline-flex";
+
+  button.addEventListener("click", () => {
+    if (typeof openAuth === "function") openAuth("signin");
+  });
+
+  if (avatarButton) {
+    avatarButton.addEventListener("click", () => {
+      const settingsLink = document.querySelector('[data-target="settings"]');
+      if (settingsLink) settingsLink.click();
+    });
+  }
+})();

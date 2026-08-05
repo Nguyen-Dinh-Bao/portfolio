@@ -1186,3 +1186,61 @@ footer {
 
 .auth-toast.success { background: #2f9e59; }
 .auth-toast.error { background: #c94747; }
+
+
+/* Version 1.4.1 — guaranteed visible authentication area */
+nav {
+  position: relative;
+}
+
+.auth-area {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+.auth-area .auth-button {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  visibility: visible !important;
+  opacity: 1 !important;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 9px 15px;
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: .7rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.auth-area .auth-button:hover {
+  background: var(--surface-strong);
+}
+
+.auth-area .user-avatar-button {
+  display: block;
+  visibility: visible !important;
+  opacity: 1 !important;
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .auth-area {
+    margin-left: 8px;
+  }
+}
+
+@media (max-width: 650px) {
+  .auth-area .auth-button {
+    min-height: 32px;
+    padding: 7px 11px;
+    font-size: .63rem;
+  }
+}
