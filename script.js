@@ -1,4 +1,18 @@
 const body = document.body;
+const progress = document.getElementById("pageProgress");
+const navbar = document.getElementById("navbar");
+
+function updatePageUI() {
+  const scrollTop = window.scrollY;
+  const height = document.documentElement.scrollHeight - window.innerHeight;
+  const percent = height > 0 ? (scrollTop / height) * 100 : 0;
+  progress.style.width = `${percent}%`;
+
+  navbar.classList.toggle("scrolled", scrollTop > 10);
+}
+
+window.addEventListener("scroll", updatePageUI, { passive: true });
+updatePageUI();
 
 const themeToggle = document.getElementById("themeToggle");
 const savedTheme = localStorage.getItem("bao-theme");
@@ -14,15 +28,47 @@ themeToggle.addEventListener("change", () => {
 });
 
 const menuButton = document.getElementById("menuButton");
-const navLinks = document.querySelector(".nav-links");
+const navLinks = document.getElementById("navLinks");
 
 menuButton.addEventListener("click", () => {
-  navLinks.classList.toggle("open");
+  const open = navLinks.classList.toggle("open");
+  menuButton.setAttribute("aria-expanded", String(open));
 });
 
 navLinks.querySelectorAll("a").forEach(link => {
-  link.addEventListener("click", () => navLinks.classList.remove("open"));
+  link.addEventListener("click", () => {
+    navLinks.classList.remove("open");
+    menuButton.setAttribute("aria-expanded", "false");
+  });
 });
+
+const sections = [...document.querySelectorAll("main section[id]")];
+const navItems = [...document.querySelectorAll(".nav-link")];
+
+const navObserver = new IntersectionObserver((entries) => {
+  const visible = entries
+    .filter(entry => entry.isIntersecting)
+    .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+  if (!visible) return;
+
+  navItems.forEach(item => {
+    item.classList.toggle("active", item.getAttribute("href") === `#${visible.target.id}`);
+  });
+}, { threshold: [0.2, 0.5, 0.8] });
+
+sections.forEach(section => navObserver.observe(section));
+
+const revealObserver = new IntersectionObserver((entries, observer) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add("visible");
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll(".reveal").forEach(item => revealObserver.observe(item));
 
 document.querySelectorAll(".settings-tab").forEach(button => {
   button.addEventListener("click", () => {
@@ -30,7 +76,12 @@ document.querySelectorAll(".settings-tab").forEach(button => {
     document.querySelectorAll(".settings-panel").forEach(panel => panel.classList.remove("active-panel"));
 
     button.classList.add("active");
-    document.getElementById(button.dataset.panel).classList.add("active-panel");
+    const panel = document.getElementById(button.dataset.panel);
+    panel.classList.add("active-panel");
+
+    panel.querySelectorAll(".reveal").forEach(item => {
+      requestAnimationFrame(() => item.classList.add("visible"));
+    });
   });
 });
 
@@ -48,14 +99,12 @@ feedbackInput.addEventListener("input", updateFeedback);
 
 feedbackSend.addEventListener("click", () => {
   const message = feedbackInput.value.trim();
-
   if (message.length < 5) return;
 
   localStorage.setItem("bao-last-feedback", message);
   feedbackInput.value = "";
   updateFeedback();
-
-  alert("Cảm ơn bạn đã gửi Feedback!");
+  showToast("Cảm ơn bạn đã gửi Feedback!");
 });
 
 const recommendFields = [
@@ -69,23 +118,15 @@ const recommendSend = document.getElementById("recommendSend");
 const recommendCounter = document.getElementById("recommendCounter");
 
 function updateRecommend() {
-  const total = recommendFields.reduce((sum, field) => {
-    return sum + field.value.trim().length;
-  }, 0);
-
+  const total = recommendFields.reduce((sum, field) => sum + field.value.trim().length, 0);
   recommendCounter.textContent = `${total} / 5 ký tự tối thiểu`;
   recommendSend.disabled = total < 5;
 }
 
-recommendFields.forEach(field => {
-  field.addEventListener("input", updateRecommend);
-});
+recommendFields.forEach(field => field.addEventListener("input", updateRecommend));
 
 recommendSend.addEventListener("click", () => {
-  const total = recommendFields.reduce((sum, field) => {
-    return sum + field.value.trim().length;
-  }, 0);
-
+  const total = recommendFields.reduce((sum, field) => sum + field.value.trim().length, 0);
   if (total < 5) return;
 
   const recommendation = {
@@ -99,8 +140,7 @@ recommendSend.addEventListener("click", () => {
 
   recommendFields.forEach(field => field.value = "");
   updateRecommend();
-
-  alert("Cảm ơn bạn đã gửi lời giới thiệu!");
+  showToast("Cảm ơn bạn đã gửi lời giới thiệu!");
 });
 
 const changeAvatar = document.getElementById("changeAvatar");
@@ -112,8 +152,12 @@ changeAvatar.addEventListener("click", () => avatarInput.click());
 
 avatarInput.addEventListener("change", () => {
   const file = avatarInput.files[0];
-
   if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    showToast("Vui lòng chọn một tệp hình ảnh.");
+    return;
+  }
 
   const reader = new FileReader();
 
@@ -121,14 +165,27 @@ avatarInput.addEventListener("change", () => {
     profileAvatar.src = event.target.result;
     accountAvatar.src = event.target.result;
     localStorage.setItem("bao-avatar", event.target.result);
+    showToast("Ảnh đại diện đã được cập nhật trên thiết bị này.");
   };
 
   reader.readAsDataURL(file);
 });
 
 const savedAvatar = localStorage.getItem("bao-avatar");
-
 if (savedAvatar) {
   profileAvatar.src = savedAvatar;
   accountAvatar.src = savedAvatar;
+}
+
+let toastTimer;
+
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.classList.add("show");
+
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2800);
 }

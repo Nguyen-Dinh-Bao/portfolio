@@ -5,103 +5,117 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nguyen Dinh Bao — Portfolio</title>
   <meta name="description" content="Nguyen Dinh Bao — Personal Portfolio">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="navbar">
-    <a class="logo" href="#about">BAO<span>.</span></a>
+  <div class="page-progress" id="pageProgress"></div>
 
-    <nav class="nav-links" aria-label="Main navigation">
-      <a href="#about">About Me</a>
-      <a href="#contact">Contact Me</a>
-      <a href="#feedback">Feedback Me</a>
-      <a href="#recommend">Recommend Me</a>
-      <a href="#settings">Setting & Account</a>
+  <header class="navbar" id="navbar">
+    <a class="logo" href="#about" aria-label="Go to About Me">KINZ<span>.</span></a>
+
+    <nav class="nav-links" id="navLinks" aria-label="Main navigation">
+      <a class="nav-link active" href="#about">About Me</a>
+      <a class="nav-link" href="#contact">Contact Me</a>
+      <a class="nav-link" href="#feedback">Feedback Me</a>
+      <a class="nav-link" href="#recommend">Recommend Me</a>
+      <a class="nav-link" href="#settings">Setting&Account</a>
     </nav>
 
-    <button class="menu-button" id="menuButton" aria-label="Open menu">☰</button>
+    <button class="menu-button" id="menuButton" aria-label="Open menu" aria-expanded="false">☰</button>
   </header>
 
   <main>
-    <section id="about" class="hero section">
-      <div class="hero-inner">
-        <div class="avatar-wrap">
-          <img id="profileAvatar" class="profile-avatar" src="assets/profile.jpg"
-               alt="Nguyen Dinh Bao"
-               onerror="this.src='https://placehold.co/360x360/f3f3f0/777?text=BAO'">
+    <section id="about" class="section hero-section">
+      <div class="hero-inner reveal">
+        <div class="hero-topline">
+          <span>01 / ABOUT ME</span>
+          <span>DA NANG · VIET NAM</span>
         </div>
 
-        <p class="small-label">WELCOME</p>
-        <h1>Nguyen Dinh Bao</h1>
+        <div class="avatar-wrap">
+          <div class="avatar-ring">
+            <img id="profileAvatar" class="profile-avatar" src="assets/profile.jpg"
+                 alt="Nguyen Dinh Bao"
+                 onerror="this.src='https://placehold.co/400x400/f0f0ec/777?text=BAO'">
+          </div>
+        </div>
+
+        <p class="eyebrow">HELLO, I'M</p>
+        <h1>Nguyen Dinh<br><em>Bao.</em></h1>
         <p class="hero-description">
           Student · Learner · Creator
         </p>
 
+        <a class="scroll-hint" href="#contact">
+          <span>EXPLORE</span>
+          <span class="scroll-line"></span>
+          <span>↓</span>
+        </a>
+
         <div class="about-grid">
           <article class="info-card">
-            <span class="card-number">01</span>
+            <div class="card-top"><span>01</span><span>EDUCATION</span></div>
             <h2>Trình Độ Học Vấn</h2>
-            <p>Thêm thông tin về trường học, thành tích, chứng chỉ hoặc mục tiêu học tập của bạn.</p>
+            <p>Thêm trường học, thành tích, chứng chỉ hoặc mục tiêu học tập của bạn.</p>
+            <button class="card-action" type="button">Edit later <span>↗</span></button>
           </article>
 
           <article class="info-card">
-            <span class="card-number">02</span>
+            <div class="card-top"><span>02</span><span>PROFILE</span></div>
             <h2>Thông Tin Cá Nhân</h2>
-            <p>Giới thiệu ngắn gọn về bản thân, sở thích và những điều bạn muốn mọi người biết.</p>
+            <p>Giới thiệu ngắn gọn về bản thân, sở thích và những điều bạn muốn chia sẻ.</p>
+            <button class="card-action" type="button">Edit later <span>↗</span></button>
           </article>
 
           <article class="info-card">
-            <span class="card-number">03</span>
+            <div class="card-top"><span>03</span><span>MORE</span></div>
             <h2>Thông Tin Thêm</h2>
             <p>Thêm dự án, kỹ năng, câu nói yêu thích hoặc bất kỳ nội dung nào bạn muốn.</p>
+            <button class="card-action" type="button">Edit later <span>↗</span></button>
           </article>
         </div>
-
-        <a class="scroll-hint" href="#contact">
-          <span>SCROLL TO EXPLORE</span>
-          <span class="arrow">↓</span>
-        </a>
       </div>
     </section>
 
     <section id="contact" class="section content-section">
-      <div class="section-heading">
-        <p class="small-label">02 / CONTACT</p>
-        <h2>Contact Me</h2>
-        <p>Find me around the internet.</p>
+      <div class="section-heading reveal">
+        <div>
+          <p class="eyebrow">02 / CONTACT</p>
+          <h2>Contact <em>Me.</em></h2>
+        </div>
+        <p class="heading-note">Let's connect.</p>
       </div>
 
-      <div class="social-list">
+      <div class="social-list reveal">
         <a class="social-row" href="#" target="_blank" rel="noopener">
-          <span class="social-icon">f</span>
+          <span class="social-icon facebook">f</span>
           <span class="social-name">Facebook</span>
           <span class="social-link">facebook.com/yourusername</span>
           <span class="row-arrow">↗</span>
         </a>
-
         <a class="social-row" href="#" target="_blank" rel="noopener">
-          <span class="social-icon">◎</span>
+          <span class="social-icon instagram">◎</span>
           <span class="social-name">Instagram</span>
           <span class="social-link">instagram.com/yourusername</span>
           <span class="row-arrow">↗</span>
         </a>
-
         <a class="social-row" href="#" target="_blank" rel="noopener">
-          <span class="social-icon">in</span>
+          <span class="social-icon linkedin">in</span>
           <span class="social-name">LinkedIn</span>
           <span class="social-link">linkedin.com/in/yourusername</span>
           <span class="row-arrow">↗</span>
         </a>
-
         <a class="social-row" href="#" target="_blank" rel="noopener">
-          <span class="social-icon">S</span>
+          <span class="social-icon snapchat">S</span>
           <span class="social-name">Snapchat</span>
           <span class="social-link">snapchat.com/add/yourusername</span>
           <span class="row-arrow">↗</span>
         </a>
-
         <a class="social-row" href="#" target="_blank" rel="noopener">
-          <span class="social-icon">♪</span>
+          <span class="social-icon tiktok">♪</span>
           <span class="social-name">TikTok</span>
           <span class="social-link">tiktok.com/@yourusername</span>
           <span class="row-arrow">↗</span>
@@ -109,78 +123,84 @@
       </div>
     </section>
 
-    <section id="feedback" class="section content-section">
-      <div class="section-heading">
-        <p class="small-label">03 / FEEDBACK</p>
-        <h2>Feedback Me</h2>
+    <section id="feedback" class="section content-section compact-section">
+      <div class="section-heading reveal">
+        <div>
+          <p class="eyebrow">03 / FEEDBACK</p>
+          <h2>Feedback <em>Me.</em></h2>
+        </div>
       </div>
 
-      <div class="feedback-layout">
+      <div class="feedback-layout reveal">
+        <div class="quote-mark">“</div>
         <p class="quote">
-          “Vạn vật đều có vết nứt, đó là nơi ánh sáng chiếu vào
-          - Hãy là ánh sáng hoàn thiện tôi!”
+          Vạn vật đều có vết nứt, đó là nơi ánh sáng chiếu vào<br>
+          <strong>Hãy là ánh sáng hoàn thiện tôi!</strong>
         </p>
 
         <div class="feedback-box">
-          <textarea id="feedbackInput" maxlength="1000"
-                    placeholder="Hãy viết điều bạn muốn nói với tôi..."></textarea>
+          <textarea id="feedbackInput" maxlength="1000" placeholder="Hãy viết điều bạn muốn nói với tôi..."></textarea>
           <div class="form-bottom">
             <span id="feedbackCounter">0 / 5 ký tự tối thiểu</span>
-            <button id="feedbackSend" class="dark-button" disabled>Send</button>
+            <button id="feedbackSend" class="dark-button" disabled>Send <span>↗</span></button>
           </div>
         </div>
       </div>
     </section>
 
     <section id="recommend" class="section content-section">
-      <div class="section-heading">
-        <p class="small-label">04 / RECOMMEND</p>
-        <h2>Recommend Me</h2>
+      <div class="section-heading reveal">
+        <div>
+          <p class="eyebrow">04 / RECOMMEND</p>
+          <h2>Recommend <em>Me.</em></h2>
+        </div>
+        <p class="heading-note">Share something new.</p>
       </div>
 
-      <div class="recommend-box">
+      <div class="recommend-box reveal">
         <div class="recommend-item">
-          <span>01</span>
+          <div class="recommend-number">01</div>
           <label for="book">Giới thiệu cho tôi sách hay và tên tác giả nhé!</label>
           <textarea id="book" placeholder="Tên sách — Tác giả..."></textarea>
         </div>
 
         <div class="recommend-item">
-          <span>02</span>
+          <div class="recommend-number">02</div>
           <label for="media">Giới thiệu cho tôi Nhạc/Phim hay nhé:</label>
           <textarea id="media" placeholder="Tên bài hát, album hoặc bộ phim..."></textarea>
         </div>
 
         <div class="recommend-item">
-          <span>03</span>
+          <div class="recommend-number">03</div>
           <label for="story">Hãy kể tôi một câu chuyện hoặc giới thiệu 1 điều gì đó mới mẻ</label>
           <textarea id="story" placeholder="Điều thú vị mà bạn muốn chia sẻ..."></textarea>
         </div>
 
         <div class="recommend-item">
-          <span>04</span>
+          <div class="recommend-number">04</div>
           <label for="explanation">Hãy giải thích thêm cho sự giới thiệu của bạn nhé!</label>
           <textarea id="explanation" placeholder="Tại sao bạn lại giới thiệu điều này?"></textarea>
         </div>
 
         <div class="form-bottom recommend-footer">
           <span id="recommendCounter">0 / 5 ký tự tối thiểu</span>
-          <button id="recommendSend" class="dark-button" disabled>Send</button>
+          <button id="recommendSend" class="dark-button" disabled>Send <span>↗</span></button>
         </div>
       </div>
     </section>
 
     <section id="settings" class="section settings-section">
       <div class="settings-layout">
-        <aside class="settings-sidebar">
-          <p class="small-label">05 / SETTINGS</p>
-          <button class="settings-tab active" data-panel="appearance">Appearance</button>
-          <button class="settings-tab" data-panel="account">Account</button>
+        <aside class="settings-sidebar reveal">
+          <p class="eyebrow">05 / SETTINGS</p>
+          <div class="sidebar-title">Setting<br><em>& Account.</em></div>
+          <button class="settings-tab active" data-panel="appearance">Appearance <span>01</span></button>
+          <button class="settings-tab" data-panel="account">Account <span>02</span></button>
         </aside>
 
         <div class="settings-main">
-          <div id="appearance" class="settings-panel active-panel">
-            <p class="small-label">PREFERENCES</p>
+          <div id="appearance" class="settings-panel active-panel reveal">
+            <p class="eyebrow">PREFERENCES / 01</p>
             <h2>Appearance</h2>
             <div class="setting-line">
               <div>
@@ -194,15 +214,22 @@
             </div>
           </div>
 
-          <div id="account" class="settings-panel">
-            <p class="small-label">PROFILE</p>
+          <div id="account" class="settings-panel reveal">
+            <p class="eyebrow">PROFILE / 02</p>
             <h2>Account</h2>
+
             <div class="account-preview">
-              <img id="accountAvatar" class="account-avatar" src="assets/profile.jpg"
-                   alt="Account avatar"
-                   onerror="this.src='https://placehold.co/220x220/f3f3f0/777?text=BAO'">
-              <button id="changeAvatar" class="text-button">Thay đổi</button>
-              <input id="avatarInput" type="file" accept="image/*" hidden>
+              <div class="account-avatar-wrap">
+                <img id="accountAvatar" class="account-avatar" src="assets/profile.jpg"
+                     alt="Account avatar"
+                     onerror="this.src='https://placehold.co/260x260/f0f0ec/777?text=BAO'">
+                <span class="online-dot"></span>
+              </div>
+              <div>
+                <p class="account-name">Nguyen Dinh Bao</p>
+                <button id="changeAvatar" class="text-button">Thay đổi ảnh đại diện ↗</button>
+                <input id="avatarInput" type="file" accept="image/*" hidden>
+              </div>
             </div>
 
             <div class="account-fields">
@@ -219,9 +246,10 @@
 
   <footer>
     <span>© 2026 Nguyen Dinh Bao</span>
-    <span>Built with HTML · CSS · JavaScript</span>
+    <span>ContactKinz / Portfolio</span>
   </footer>
 
+  <div class="toast" id="toast" role="status"></div>
   <script src="script.js"></script>
 </body>
 </html>
