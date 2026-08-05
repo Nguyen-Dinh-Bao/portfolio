@@ -295,6 +295,42 @@
     </div>
   </div>
 
+
+  <div class="modal-backdrop" id="authModal" aria-hidden="true">
+    <div class="edit-modal auth-modal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">KINZ / ACCOUNT</p>
+          <h2 id="authTitle">Sign In</h2>
+        </div>
+        <button class="modal-close" id="closeAuthModal" type="button" aria-label="Close">×</button>
+      </div>
+
+      <div class="auth-tabs">
+        <button id="signInTab" class="auth-tab active" type="button">Sign In</button>
+        <button id="signUpTab" class="auth-tab" type="button">Sign Up</button>
+      </div>
+
+      <form id="authForm" novalidate>
+        <label class="modal-field">
+          <span id="authIdentityLabel">Username hoặc Gmail</span>
+          <input id="authIdentity" type="text" autocomplete="username" placeholder="Username">
+        </label>
+
+        <label class="modal-field">
+          <span>Password</span>
+          <div class="password-wrap auth-password-wrap">
+            <input id="authPassword" type="password" autocomplete="current-password" placeholder="Password">
+            <button id="authPasswordToggle" type="button" aria-label="Show password">◉</button>
+          </div>
+        </label>
+
+        <p id="authHint" class="auth-hint">Đăng nhập bằng Username hoặc Gmail đã lưu trong tài khoản.</p>
+        <button id="authSubmit" class="dark-button auth-submit" type="submit">Sign In <span>↗</span></button>
+      </form>
+    </div>
+  </div>
+
   <footer>
     <span>© 2026 Nguyen Dinh Bao</span>
     <span>ContactKinz / Portfolio</span>

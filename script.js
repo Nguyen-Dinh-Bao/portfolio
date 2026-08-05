@@ -438,3 +438,205 @@ addInfoCard.addEventListener("click", () => {
 });
 
 renderInfoCards();
+
+
+/* Version 1.4 — Sign In / Sign Up local demo */
+const AUTH_USERS_KEY = "bao-auth-users";
+const CURRENT_USER_KEY = "bao-current-user";
+
+const authModal = document.getElementById("authModal");
+const authButton = document.getElementById("authButton");
+const userAvatarButton = document.getElementById("userAvatarButton");
+const navAvatar = document.getElementById("navAvatar");
+const closeAuthModal = document.getElementById("closeAuthModal");
+const signInTab = document.getElementById("signInTab");
+const signUpTab = document.getElementById("signUpTab");
+const authTitle = document.getElementById("authTitle");
+const authForm = document.getElementById("authForm");
+const authIdentity = document.getElementById("authIdentity");
+const authPassword = document.getElementById("authPassword");
+const authPasswordToggle = document.getElementById("authPasswordToggle");
+const authSubmit = document.getElementById("authSubmit");
+const authIdentityLabel = document.getElementById("authIdentityLabel");
+const authHint = document.getElementById("authHint");
+
+let authMode = "signin";
+
+function getUsers() {
+  try {
+    const users = JSON.parse(localStorage.getItem(AUTH_USERS_KEY));
+    return Array.isArray(users) ? users : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveUsers(users) {
+  localStorage.setItem(AUTH_USERS_KEY, JSON.stringify(users));
+}
+
+function getCurrentUser() {
+  try {
+    return JSON.parse(localStorage.getItem(CURRENT_USER_KEY));
+  } catch {
+    return null;
+  }
+}
+
+function setCurrentUser(user) {
+  if (user) localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+  else localStorage.removeItem(CURRENT_USER_KEY);
+  updateAuthUI();
+}
+
+function showAuthToast(message, type = "success") {
+  const toast = document.createElement("div");
+  toast.className = `auth-toast ${type}`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  requestAnimationFrame(() => toast.classList.add("show"));
+  setTimeout(() => {
+    toast.classList.remove("show");
+    setTimeout(() => toast.remove(), 250);
+  }, 2800);
+}
+
+function setAuthMode(mode) {
+  authMode = mode;
+  const signup = mode === "signup";
+
+  signInTab.classList.toggle("active", !signup);
+  signUpTab.classList.toggle("active", signup);
+  authTitle.textContent = signup ? "Sign Up" : "Sign In";
+  authSubmit.innerHTML = signup ? 'Đăng Kí <span>↗</span>' : 'Sign In <span>↗</span>';
+  authIdentityLabel.textContent = signup ? "Username" : "Username hoặc Gmail";
+  authIdentity.placeholder = signup ? "Username" : "Username hoặc Gmail";
+  authPassword.autocomplete = signup ? "new-password" : "current-password";
+  authHint.textContent = signup
+    ? "Username phải có ít nhất 3 ký tự và không được trùng với tài khoản đã đăng ký."
+    : "Đăng nhập bằng Username hoặc Gmail đã lưu trong tài khoản.";
+
+  authIdentity.value = "";
+  authPassword.value = "";
+  authPassword.type = "password";
+  authPasswordToggle.textContent = "◉";
+}
+
+function openAuth(mode = "signin") {
+  setAuthMode(mode);
+  authModal.classList.add("open");
+  authModal.setAttribute("aria-hidden", "false");
+  setTimeout(() => authIdentity.focus(), 50);
+}
+
+function closeAuth() {
+  authModal.classList.remove("open");
+  authModal.setAttribute("aria-hidden", "true");
+}
+
+authButton.addEventListener("click", () => openAuth("signin"));
+userAvatarButton.addEventListener("click", () => {
+  const settingsLink = document.querySelector('[data-target="settings"]');
+  if (settingsLink) settingsLink.click();
+});
+
+closeAuthModal.addEventListener("click", closeAuth);
+authModal.addEventListener("click", event => {
+  if (event.target === authModal) closeAuth();
+});
+
+signInTab.addEventListener("click", () => setAuthMode("signin"));
+signUpTab.addEventListener("click", () => setAuthMode("signup"));
+
+authPasswordToggle.addEventListener("click", () => {
+  const hidden = authPassword.type === "password";
+  authPassword.type = hidden ? "text" : "password";
+  authPasswordToggle.textContent = hidden ? "○" : "◉";
+});
+
+authForm.addEventListener("submit", event => {
+  event.preventDefault();
+
+  const identity = authIdentity.value.trim();
+  const password = authPassword.value;
+
+  if (authMode === "signup") {
+    if (!/^[A-Za-z0-9_.-]{3,30}$/.test(identity)) {
+      showAuthToast("Username không hợp lệ. Dùng 3–30 ký tự chữ, số, ., _, -.", "error");
+      return;
+    }
+
+    if (password.length < 6) {
+      showAuthToast("Password phải có ít nhất 6 ký tự.", "error");
+      return;
+    }
+
+    const users = getUsers();
+    const exists = users.some(user => user.username.toLowerCase() === identity.toLowerCase());
+
+    if (exists) {
+      showAuthToast("Username đã được sử dụng", "error");
+      return;
+    }
+
+    const newUser = {
+      id: `user-${Date.now()}`,
+      username: identity,
+      password,
+      email: "",
+      bio: "",
+      avatar: ""
+    };
+
+    users.push(newUser);
+    saveUsers(users);
+    setCurrentUser(newUser);
+    closeAuth();
+    showAuthToast("Bạn đã đăng kí thành công.", "success");
+    goHome();
+    return;
+  }
+
+  const users = getUsers();
+  const match = users.find(user =>
+    user.username.toLowerCase() === identity.toLowerCase() ||
+    (user.email && user.email.toLowerCase() === identity.toLowerCase())
+  );
+
+  if (!match || match.password !== password) {
+    showAuthToast("Thông tin đăng nhập chưa chính xác", "error");
+    return;
+  }
+
+  setCurrentUser(match);
+  closeAuth();
+  showAuthToast("Bạn đã đăng nhập thành công", "success");
+  goHome();
+});
+
+function goHome() {
+  const aboutLink = document.querySelector('[data-target="about"]');
+  if (aboutLink) aboutLink.click();
+  else window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function updateAuthUI() {
+  const user = getCurrentUser();
+
+  if (!user) {
+    authButton.hidden = false;
+    userAvatarButton.hidden = true;
+    return;
+  }
+
+  authButton.hidden = true;
+  userAvatarButton.hidden = false;
+
+  navAvatar.src = user.avatar || "assets/profile.jpg";
+  navAvatar.onerror = () => {
+    navAvatar.src = "https://placehold.co/100x100/f0f0ec/777?text=K";
+  };
+}
+
+updateAuthUI();
