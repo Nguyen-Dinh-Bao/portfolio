@@ -43,40 +43,32 @@
           </div>
         </div>
 
-        <p class="eyebrow">HELLO, I'M</p>
-        <h1>Nguyen Dinh<br><em>Bao.</em></h1>
-        <p class="hero-description">
-          Student · Learner · Creator
-        </p>
-
-        <a class="scroll-hint" href="#contact">
-          <span>EXPLORE</span>
-          <span class="scroll-line"></span>
-          <span>↓</span>
-        </a>
+        <h1>Nguyen Dinh Bao</h1>
+        <p class="hero-description">Student · Learner · Creator</p>
 
         <div class="about-grid">
-          <article class="info-card">
+          <article class="info-card editable-info-card" data-card-id="education">
             <div class="card-top"><span>01</span><span>EDUCATION</span></div>
-            <h2>Trình Độ Học Vấn</h2>
-            <p>Thêm trường học, thành tích, chứng chỉ hoặc mục tiêu học tập của bạn.</p>
-            <button class="card-action" type="button">Edit later <span>↗</span></button>
+            <h2 class="info-title">Trình Độ Học Vấn</h2>
+            <p class="info-text">Thêm trường học, thành tích, chứng chỉ hoặc mục tiêu học tập của bạn.</p>
+            <button class="card-action edit-info" type="button">Edit <span>↗</span></button>
           </article>
 
-          <article class="info-card">
+          <article class="info-card editable-info-card" data-card-id="profile">
             <div class="card-top"><span>02</span><span>PROFILE</span></div>
-            <h2>Thông Tin Cá Nhân</h2>
-            <p>Giới thiệu ngắn gọn về bản thân, sở thích và những điều bạn muốn chia sẻ.</p>
-            <button class="card-action" type="button">Edit later <span>↗</span></button>
+            <h2 class="info-title">Thông Tin Cá Nhân</h2>
+            <p class="info-text">Giới thiệu ngắn gọn về bản thân, sở thích và những điều bạn muốn chia sẻ.</p>
+            <button class="card-action edit-info" type="button">Edit <span>↗</span></button>
           </article>
 
-          <article class="info-card">
+          <article class="info-card editable-info-card" data-card-id="more">
             <div class="card-top"><span>03</span><span>MORE</span></div>
-            <h2>Thông Tin Thêm</h2>
-            <p>Thêm dự án, kỹ năng, câu nói yêu thích hoặc bất kỳ nội dung nào bạn muốn.</p>
-            <button class="card-action" type="button">Edit later <span>↗</span></button>
+            <h2 class="info-title">Thông Tin Thêm</h2>
+            <p class="info-text">Thêm dự án, kỹ năng, câu nói yêu thích hoặc bất kỳ nội dung nào bạn muốn.</p>
+            <button class="card-action edit-info" type="button">Edit <span>↗</span></button>
           </article>
         </div>
+        <button id="addInfoCard" class="add-info-card" type="button">+ Add section</button>
       </div>
     </section>
 
@@ -226,23 +218,82 @@
                 <span class="online-dot"></span>
               </div>
               <div>
-                <p class="account-name">Nguyen Dinh Bao</p>
-                <button id="changeAvatar" class="text-button">Thay đổi ảnh đại diện ↗</button>
+                <p class="account-name" id="accountNamePreview">Nguyen Dinh Bao</p>
+                <button id="changeAvatar" class="text-button" type="button">Thay đổi ảnh đại diện ↗</button>
                 <input id="avatarInput" type="file" accept="image/*" hidden>
               </div>
             </div>
 
             <div class="account-fields">
-              <div class="fake-field"><span>Username</span><strong>Nguyen Dinh Bao</strong></div>
-              <div class="fake-field"><span>Password</span><strong>••••••••</strong></div>
-              <div class="fake-field"><span>Gmail</span><strong>your-email@gmail.com</strong></div>
-              <div class="fake-field bio-field"><span>Tiểu sử</span><strong>Student · Learner · Creator</strong></div>
+              <label class="editable-field">
+                <span>Username</span>
+                <input id="accountUsername" type="text" maxlength="30" placeholder="Username">
+              </label>
+
+              <label class="editable-field password-field">
+                <span>Password</span>
+                <div class="password-wrap">
+                  <input id="accountPassword" type="password" maxlength="80" placeholder="Password">
+                  <button id="passwordToggle" type="button" aria-label="Show password">◉</button>
+                </div>
+              </label>
+
+              <label class="editable-field">
+                <span>Gmail</span>
+                <input id="accountEmail" type="email" maxlength="100" placeholder="your-email@gmail.com">
+              </label>
+
+              <label class="editable-field bio-field">
+                <span>Tiểu sử</span>
+                <textarea id="accountBio" maxlength="300" placeholder="Viết một tiểu sử ngắn..."></textarea>
+              </label>
             </div>
+
+            <div class="account-actions">
+              <button id="saveAccount" class="dark-button" type="button">Lưu thay đổi <span>↗</span></button>
+              <button id="resetAccount" class="light-button" type="button">Khôi phục</button>
+            </div>
+
+            <p class="account-note">
+              Thông tin ở phiên bản này được lưu bằng <code>localStorage</code> trên trình duyệt hiện tại.
+              Đây chưa phải hệ thống tài khoản online thật.
+            </p>
           </div>
         </div>
       </div>
     </section>
   </main>
+
+
+  <div class="modal-backdrop" id="infoModal" aria-hidden="true">
+    <div class="edit-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">ABOUT ME / EDIT</p>
+          <h2 id="modalTitle">Chỉnh sửa</h2>
+        </div>
+        <button class="modal-close" id="closeInfoModal" type="button" aria-label="Close">×</button>
+      </div>
+
+      <label class="modal-field">
+        <span>Tiêu đề</span>
+        <input id="infoTitleInput" type="text" maxlength="80" placeholder="Ví dụ: Trình Độ Học Vấn">
+      </label>
+
+      <label class="modal-field">
+        <span>Nội dung</span>
+        <textarea id="infoTextInput" maxlength="500" placeholder="Viết nội dung..."></textarea>
+      </label>
+
+      <div class="modal-actions">
+        <button id="deleteInfoCard" class="danger-button" type="button">Xóa ô này</button>
+        <div>
+          <button id="cancelInfoEdit" class="light-button" type="button">Hủy</button>
+          <button id="saveInfoEdit" class="dark-button" type="button">Lưu thay đổi <span>↗</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <footer>
     <span>© 2026 Nguyen Dinh Bao</span>
