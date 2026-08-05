@@ -207,7 +207,6 @@ const accountStatusText = document.getElementById("accountStatusText");
 const saveAccount = document.getElementById("saveAccount");
 const resetAccount = document.getElementById("resetAccount");
 const passwordToggle = document.getElementById("passwordToggle");
-const avatarInput = document.getElementById("avatarInput");
 const signOutButton = document.getElementById("signOutButton");
 
 async function getSession() {
