@@ -678,6 +678,11 @@ const heroSubtitleInput =
 const addInfoCard = document.getElementById("addInfoCard");
 const editPortfolioButton =
     document.getElementById("editPortfolioButton");
+    editPortfolioButton?.addEventListener("click", async () => {
+
+    await openInfoEditor("education");
+
+});
 let editingCardId = null;
 
 async function renderInfoCards() {
