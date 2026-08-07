@@ -589,11 +589,37 @@ function saveInfoCards() {
   localStorage.setItem("bao-info-cards", JSON.stringify(infoCards));
 }
 
-function renderInfoCards() {
+async function renderInfoCards() {
   const grid = document.querySelector(".about-grid");
   grid.innerHTML = "";
+  const portfolio = await loadPortfolio();
 
-  infoCards.forEach((card, index) => {
+  if (!portfolio) {
+    showToast("Không thể tải Portfolio.");
+    return;
+}
+  const infoCards = [
+    {
+        id: "education",
+        label: "EDUCATION",
+        title: portfolio.education_title,
+        text: portfolio.education_text
+    },
+    {
+        id: "profile",
+        label: "PROFILE",
+        title: portfolio.profile_title,
+        text: portfolio.profile_text
+    },
+    {
+        id: "more",
+        label: "MORE",
+        title: portfolio.more_title,
+        text: portfolio.more_text
+    }
+];
+
+infoCards.forEach((card, index) => {
     const article = document.createElement("article");
     article.className = "info-card editable-info-card";
     article.dataset.cardId = card.id;
@@ -601,15 +627,17 @@ function renderInfoCards() {
     article.innerHTML = `
       <div class="card-top">
         <span>${String(index + 1).padStart(2, "0")}</span>
-        <span>${escapeHTML(card.label || "MORE")}</span>
+        <span>${escapeHTML(card.label)}</span>
       </div>
       <h2 class="info-title">${escapeHTML(card.title)}</h2>
       <p class="info-text">${escapeHTML(card.text)}</p>
-      <button class="card-action edit-info owner-only" type="button">Edit <span>↗</span></button>
+      <button class="card-action edit-info owner-only" type="button">
+        Edit <span>↗</span>
+      </button>
     `;
 
     grid.appendChild(article);
-  });
+});
 
   grid.querySelectorAll(".edit-info").forEach(button => {
     button.addEventListener("click", async () => {
