@@ -197,7 +197,9 @@ function showToast(message) {
     toast.classList.remove("show");
   }, 2800);
 }
-
+function showAuthToast(message, type) {
+    showToast(message);
+}
 
 
 /* Version 2.1 — online Account/Profile */
