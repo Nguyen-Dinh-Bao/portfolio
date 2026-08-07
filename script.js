@@ -98,16 +98,40 @@ function updateFeedback() {
 feedbackInput.addEventListener("input", updateFeedback);
 
 feedbackSend.addEventListener("click", async () => {
-  if (await isVisitor()) {
-    showAuthToast("Bạn cần đăng nhập để gửi Feedback.", "error");
+  if (currentUserRole !== "user" && currentUserRole !== "owner") {
+    showToast("Bạn cần đăng nhập để gửi Feedback.");
     return;
-}
-  const message = feedbackInput.value.trim();
-  if (message.length < 5) return;
+  }
 
-  localStorage.setItem("bao-last-feedback", message);
+  const session = await getSession();
+
+  if (!session) {
+    showAuthToast("Hãy đăng nhập trước khi gửi Feedback.", "error");
+    return;
+  }
+
+  const message = feedbackInput.value.trim();
+
+  if (message.length < 5) {
+    showToast("Feedback quá ngắn.");
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("feedback")
+    .insert({
+      user_id: session.user.id,
+      message: message
+    });
+
+  if (error) {
+    console.error(error);
+    showAuthToast("Không thể gửi Feedback.", "error");
+    return;
+  }
+
   feedbackInput.value = "";
-  updateFeedback();
+
   showToast("Cảm ơn bạn đã gửi Feedback!");
 });
 
@@ -129,12 +153,17 @@ function updateRecommend() {
 
 recommendFields.forEach(field => field.addEventListener("input", updateRecommend));
 
-recommendSend.addEventListener("click", async () => {
-  if (await isVisitor()) {
-    showAuthToast("Bạn cần đăng nhập để gửi Recommend.", "error");
+recommendSend.addEventListener("click", () => {
+  if (currentUserRole !== "user" && currentUserRole !== "owner") {
+    showToast("Bạn cần đăng nhập để gửi Recommend.");
     return;
-}
-  const total = recommendFields.reduce((sum, field) => sum + field.value.trim().length, 0);
+  }
+
+  const total = recommendFields.reduce(
+    (sum, field) => sum + field.value.trim().length,
+    0
+  );
+
   if (total < 5) return;
 
   const recommendation = {
@@ -144,10 +173,14 @@ recommendSend.addEventListener("click", async () => {
     explanation: document.getElementById("explanation").value
   };
 
-  localStorage.setItem("bao-last-recommendation", JSON.stringify(recommendation));
+  localStorage.setItem(
+    "bao-last-recommendation",
+    JSON.stringify(recommendation)
+  );
 
   recommendFields.forEach(field => field.value = "");
   updateRecommend();
+
   showToast("Cảm ơn bạn đã gửi lời giới thiệu!");
 });
 
@@ -225,11 +258,44 @@ async function getSession() {
 }
 async function getCurrentProfile() {
   const session = await getSession();
-  if (!session) return null;
-  const { data, error } = await supabaseClient.from("profiles")
-    .select("id,username,email,bio,avatar_url,role").eq("id", session.user.id).maybeSingle();
-  if (error) { console.error(error); return null; }
+  if (!session?.user) return null;
+
+  const { data, error } = await supabaseClient
+    .from("profiles")
+    .select("id,username,email,bio,avatar_url,role")
+    .eq("id", session.user.id)
+    .maybeSingle();
+
+  if (error) {
+    console.error(error);
+    return null;
+  }
+
   return data;
+}
+let currentUserRole = "visitor";
+
+function applyRoleUI(role) {
+  currentUserRole = role || "visitor";
+
+  const isOwner = currentUserRole === "owner";
+  const isUser = currentUserRole === "user";
+
+  if (feedbackSend) {
+    feedbackSend.disabled = !isUser && !isOwner;
+  }
+
+  if (recommendSend) {
+    recommendSend.disabled = !isUser && !isOwner;
+  }
+
+  document.querySelectorAll(".edit-info").forEach(button => {
+    button.hidden = !isOwner;
+  });
+
+  if (addInfoCard) {
+    addInfoCard.hidden = !isOwner;
+  }
 }
 async function getCurrentRole() {
     const profile = await getCurrentProfile();
@@ -286,13 +352,19 @@ async function refreshAccountUI() {
   const authBtn = document.getElementById("authButton");
   const navAvatar = document.getElementById("navAvatar");
   if (!profile) {
-    authBtn.hidden=false; avatarBtn.hidden=true;
-    renderSignedInAccount(null); return;
+   authBtn.hidden = false;
+   avatarBtn.hidden = true;
+   applyRoleUI("visitor");
+   renderSignedInAccount(null);
+   return;
   }
-  authBtn.hidden=true; avatarBtn.hidden=false;
-  navAvatar.src=profile.avatar_url || "assets/profile.jpg";
-  renderSignedInAccount(profile);
-  await updatePermissionUI();
+ authBtn.hidden = true;
+ avatarBtn.hidden = false;
+ navAvatar.src = profile.avatar_url || "assets/profile.jpg";
+
+ applyRoleUI(profile.role);
+
+ renderSignedInAccount(profile);
 }
 saveAccount?.addEventListener("click", async () => {
   const session=await getSession();
