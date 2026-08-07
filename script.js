@@ -268,6 +268,37 @@ async function getCurrentProfile() {
   return data;
 }
 async function loadPortfolio() {
+  async function savePortfolio(cardId, title, text) {
+
+    const update = {};
+
+    if (cardId === "education") {
+        update.education_title = title;
+        update.education_text = text;
+    }
+
+    if (cardId === "profile") {
+        update.profile_title = title;
+        update.profile_text = text;
+    }
+
+    if (cardId === "more") {
+        update.more_title = title;
+        update.more_text = text;
+    }
+
+    const { error } = await supabaseClient
+        .from("portfolio")
+        .update(update)
+        .eq("id", 1);
+
+    if (error) {
+        console.error(error);
+        return false;
+    }
+
+    return true;
+}
   const { data, error } = await supabaseClient
     .from("portfolio")
     .select("*")
@@ -693,7 +724,7 @@ document.addEventListener("keydown", event => {
   }
 });
 
-saveInfoEdit.addEventListener("click", () => {
+saveInfoEdit.addEventListener("click", async () => {
   const title = infoTitleInput.value.trim();
   const text = infoTextInput.value.trim();
 
@@ -702,14 +733,17 @@ saveInfoEdit.addEventListener("click", () => {
     return;
   }
 
-  const card = infoCards.find(item => item.id === editingCardId);
-  if (!card) return;
+const ok = await savePortfolio(
+    editingCardId,
+    title,
+    text
+);
 
-  card.title = title;
-  card.text = text;
-
-  saveInfoCards();
-  renderInfoCards();
+if (!ok) {
+    showToast("Không thể lưu dữ liệu.");
+    return;
+}
+  await renderInfoCards();
   closeEditor();
   showToast("Đã lưu thông tin About Me.");
 });
@@ -721,7 +755,7 @@ deleteInfoCard.addEventListener("click", () => {
 
   infoCards = infoCards.filter(card => card.id !== editingCardId);
   saveInfoCards();
-  renderInfoCards();
+  await renderInfoCards();
   closeEditor();
   showToast("Đã xóa ô thông tin.");
 });
@@ -740,11 +774,11 @@ addInfoCard.addEventListener("click", async () => {
   });
 
   saveInfoCards();
-  renderInfoCards();
+  await renderInfoCards();
   await openInfoEditor(id);
 });
 
-renderInfoCards();
+await renderInfoCards();
 
 
 
