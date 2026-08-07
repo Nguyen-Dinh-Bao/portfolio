@@ -267,8 +267,7 @@ async function getCurrentProfile() {
 
   return data;
 }
-async function loadPortfolio() {
-  async function savePortfolio(cardId, title, text) {
+async function savePortfolio(cardId, title, text) {
 
     const update = {};
 
@@ -299,6 +298,7 @@ async function loadPortfolio() {
 
     return true;
 }
+async function loadPortfolio() {
   const { data, error } = await supabaseClient
     .from("portfolio")
     .select("*")
