@@ -585,10 +585,16 @@ authForm.addEventListener("submit",async e=>{
     if(password.length<6)return showAuthToast("Password phải có ít nhất 6 ký tự.","error");
     if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()))return showAuthToast("Gmail chưa đúng định dạng.","error");
     const {data,error}=await supabaseClient.auth.signUp({email:email.trim(),password,options:{data:{username:identity}}});
-    if(error)return showAuthToast(error.message.toLowerCase().includes("already")?"Email đã được sử dụng.":error.message,"error");
+    if(error){
+    console.error(error);
+    return showAuthToast(error.message,"error");
+    }
     if(!data.user)return showAuthToast("Không thể tạo tài khoản.","error");
     const {data:profile,error:pe}=await supabaseClient.from("profiles").insert({id:data.user.id,username:identity,email:email.trim(),bio:""}).select("id,username,email,bio,avatar_url").single();
-    if(pe){console.error(pe);return showAuthToast("Tài khoản Auth đã tạo nhưng profile chưa tạo. Kiểm tra RLS.","error");}
+    if(pe){
+    console.error(pe);
+    return showAuthToast(pe.message,"error");
+    }
     closeAuth();
     if(data.session){await refreshAccountUI();goHome();showAuthToast("Bạn đã đăng kí thành công.","success");}
     else showAuthToast("Đăng kí thành công. Hãy xác nhận Gmail rồi đăng nhập.","success");
