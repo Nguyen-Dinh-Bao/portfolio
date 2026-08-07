@@ -402,7 +402,7 @@ function renderInfoCards() {
   });
 
   grid.querySelectorAll(".edit-info").forEach(button => {
-    button.addEventListener("click", () => {
+    button.addEventListener("click", async () => {
       const card = button.closest(".info-card");
       await openInfoEditor(card.dataset.cardId);
     });
