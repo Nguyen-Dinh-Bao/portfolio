@@ -1,3 +1,10 @@
+const SUPABASE_URL = "https://fwskrzmivcwauleualio.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_mQpBQfiOkIJNjy4qeqBX4w_7xmnJPhO";
+
+const supabaseClient = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+);
 const body = document.body;
 const progress = document.getElementById("pageProgress");
 const navbar = document.getElementById("navbar");
@@ -522,6 +529,9 @@ const authTitle=document.getElementById("authTitle");
 const authForm=document.getElementById("authForm");
 const authIdentity=document.getElementById("authIdentity");
 const authPassword=document.getElementById("authPassword");
+const authEmail = document.getElementById("authEmail");
+const authConfirmPassword = document.getElementById("authConfirmPassword");
+const signupOnlyFields = document.querySelectorAll(".auth-signup-only");
 const authPasswordToggle=document.getElementById("authPasswordToggle");
 const authSubmit=document.getElementById("authSubmit");
 const authIdentityLabel=document.getElementById("authIdentityLabel");
@@ -529,10 +539,23 @@ const authHint=document.getElementById("authHint");
 let authMode="signin";
 
 function setAuthMode(mode){
-  authMode=mode; const signup=mode==="signup";
+  authMode=mode;
+  const signup = mode === "signup";
+  signupOnlyFields.forEach(field=>{
+    field.style.display = signup ? "block" : "none";
+  });
   signInTab.classList.toggle("active",!signup); signUpTab.classList.toggle("active",signup);
-  authTitle.textContent=signup?"Sign Up":"Sign In";
-  authSubmit.innerHTML=signup?'Đăng Kí <span>↗</span>':'Sign In <span>↗</span>';
+  authTitle.textContent = signup ? "Sign Up" : "Sign In";
+  authIdentityLabel.textContent =
+    signup
+        ? "Username"
+        : "Username hoặc Gmail";
+
+authIdentity.placeholder = "Username";
+ authSubmit.innerHTML =
+    signup
+        ? 'Sign Up <span>↗</span>'
+        : 'Sign In <span>↗</span>';
   authIdentityLabel.textContent=signup?"Username":"Username hoặc Gmail";
   authIdentity.placeholder=signup?"Username":"Username hoặc Gmail";
   authHint.textContent=signup?"Username 3–30 ký tự. Gmail sẽ được dùng cho tài khoản Supabase.":"Đăng nhập bằng Username hoặc Gmail.";
@@ -550,11 +573,23 @@ authPasswordToggle.addEventListener("click",()=>{const h=authPassword.type==="pa
 
 authForm.addEventListener("submit",async e=>{
   e.preventDefault();
-  const identity=authIdentity.value.trim(), password=authPassword.value;
+  const identity = authIdentity.value.trim();
+  const email = authEmail.value.trim();
+  const password = authPassword.value;
+  const confirmPassword = authConfirmPassword.value;
   if(authMode==="signup"){
+    if(!email){
+    return showAuthToast("Vui lòng nhập Email.","error");
+    }
+
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    return showAuthToast("Email không hợp lệ.","error");
+    }
+    if(password !== confirmPassword){
+    return showAuthToast("Mật khẩu xác nhận không khớp.","error");
+    }
     if(!/^[A-Za-z0-9_.-]{3,30}$/.test(identity))return showAuthToast("Username không hợp lệ.","error");
     if(password.length<6)return showAuthToast("Password phải có ít nhất 6 ký tự.","error");
-    const email=prompt("Nhập Gmail để tạo tài khoản:");
     if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()))return showAuthToast("Gmail chưa đúng định dạng.","error");
     const {data,error}=await supabaseClient.auth.signUp({email:email.trim(),password,options:{data:{username:identity}}});
     if(error)return showAuthToast(error.message.toLowerCase().includes("already")?"Email đã được sử dụng.":error.message,"error");
