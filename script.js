@@ -601,11 +601,6 @@ authForm.addEventListener("submit",async e=>{
     return showAuthToast(error.message,"error");
     }
     if(!data.user)return showAuthToast("Không thể tạo tài khoản.","error");
-    const {data:profile,error:pe}=await supabaseClient.from("profiles").insert({id:data.user.id,username:identity,email:email.trim(),bio:""}).select("id,username,email,bio,avatar_url").single();
-    if(pe){
-    console.error(pe);
-    return showAuthToast(pe.message,"error");
-    }
     closeAuth();
     if(data.session){await refreshAccountUI();goHome();showAuthToast("Bạn đã đăng kí thành công.","success");}
     else showAuthToast("Đăng kí thành công. Hãy xác nhận Gmail rồi đăng nhập.","success");
