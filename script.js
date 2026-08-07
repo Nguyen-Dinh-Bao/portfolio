@@ -594,13 +594,16 @@ authForm.addEventListener("submit",async e=>{
     else showAuthToast("Đăng kí thành công. Hãy xác nhận Gmail rồi đăng nhập.","success");
     return;
   }
-  let email=identity;
+  let loginEmail = identity;
   if(!identity.includes("@")){
     const {data,error}=await supabaseClient.from("profiles").select("email").eq("username",identity).maybeSingle();
     if(error||!data?.email)return showAuthToast("Thông tin đăng nhập chưa chính xác","error");
-    email=data.email;
+    loginEmail = data.email;
   }
-  const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email: loginEmail,
+    password
+  });
   if(error||!data.session)return showAuthToast("Thông tin đăng nhập chưa chính xác","error");
   closeAuth();await refreshAccountUI();goHome();showAuthToast("Bạn đã đăng nhập thành công","success");
 });
