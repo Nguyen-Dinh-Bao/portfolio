@@ -154,33 +154,55 @@ function updateRecommend() {
 
 recommendFields.forEach(field => field.addEventListener("input", updateRecommend));
 
-recommendSend.addEventListener("click", () => {
+recommendSend.addEventListener("click", async () => {
   if (currentUserRole !== "user" && currentUserRole !== "owner") {
     showToast("Bạn cần đăng nhập để gửi Recommend.");
     return;
   }
 
-  const total = recommendFields.reduce(
-    (sum, field) => sum + field.value.trim().length,
-    0
-  );
+  const session = await getSession();
 
-  if (total < 5) return;
+  if (!session) {
+    showAuthToast("Hãy đăng nhập trước khi gửi Recommend.", "error");
+    return;
+  }
 
-  const recommendation = {
-    book: document.getElementById("book").value,
-    media: document.getElementById("media").value,
-    story: document.getElementById("story").value,
-    explanation: document.getElementById("explanation").value
-  };
+  const book = document.getElementById("book").value.trim();
+  const media = document.getElementById("media").value.trim();
+  const story = document.getElementById("story").value.trim();
+  const explanation = document.getElementById("explanation").value.trim();
 
-  localStorage.setItem(
-    "bao-last-recommendation",
-    JSON.stringify(recommendation)
-  );
+  const total =
+    book.length +
+    media.length +
+    story.length +
+    explanation.length;
 
-  recommendFields.forEach(field => field.value = "");
-  updateRecommend();
+  if (total < 5) {
+    showToast("Vui lòng nhập thêm nội dung.");
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("recommendations")
+    .insert({
+      user_id: session.user.id,
+      book: book,
+      media: media,
+      story: story,
+      explanation: explanation
+    });
+
+  if (error) {
+    console.error(error);
+    showAuthToast("Không thể gửi Recommend.", "error");
+    return;
+  }
+
+  document.getElementById("book").value = "";
+  document.getElementById("media").value = "";
+  document.getElementById("story").value = "";
+  document.getElementById("explanation").value = "";
 
   showToast("Cảm ơn bạn đã gửi lời giới thiệu!");
 });
