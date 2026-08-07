@@ -488,6 +488,15 @@ passwordToggle?.addEventListener("click",()=>{const h=accountPassword.type==="pa
 changeAvatar?.addEventListener("click",async()=>{if(await getSession()) avatarInput.click();else showAuthToast("Hãy đăng nhập trước.","error");});
 avatarInput?.addEventListener("change",async()=>{
   const f=avatarInput.files?.[0], s=await getSession(); if(!f||!s)return;
+  console.log("AVATAR USER ID:", s.user.id);
+console.log("AVATAR EMAIL:", s.user.email);
+console.log("AVATAR PATH:", `${s.user.id}/avatar.jpg`);
+
+const { data: authData, error: authError } =
+  await supabaseClient.auth.getUser();
+
+console.log("AUTH USER ID:", authData?.user?.id);
+console.log("AUTH ERROR:", authError);
   if(!f.type.startsWith("image/")) return showAuthToast("Vui lòng chọn file ảnh.","error");
   if(f.size>2*1024*1024)return showAuthToast("Ảnh nên nhỏ hơn 2 MB.","error");
   const ext=f.name.split(".").pop().toLowerCase()||"jpg", path=`${s.user.id}/avatar.${ext}`;
