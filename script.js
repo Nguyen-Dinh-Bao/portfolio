@@ -851,29 +851,29 @@ saveInfoEdit.addEventListener("click", async () => {
     return;
   }
 
-let fields = {};
+let fields = {
+
+    hero_name: heroNameInput.value.trim(),
+
+    hero_subtitle: heroSubtitleInput.value.trim()
+
+};
 
 switch (editingCardId) {
 
     case "education":
-        fields = {
-            education_title: title,
-            education_text: text
-        };
+        fields.education_title = title;
+        fields.education_text = text;
         break;
 
     case "profile":
-        fields = {
-            profile_title: title,
-            profile_text: text
-        };
+        fields.profile_title = title;
+        fields.profile_text = text;
         break;
 
     case "more":
-        fields = {
-            more_title: title,
-            more_text: text
-        };
+        fields.more_title = title;
+        fields.more_text = text;
         break;
 }
 
