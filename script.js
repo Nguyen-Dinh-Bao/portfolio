@@ -218,6 +218,8 @@ const portfolioAvatarInput =
 
 const profileAvatar =
     document.getElementById("profileAvatar");
+const heroName = document.getElementById("heroName");
+const heroSubtitle = document.getElementById("heroSubtitle");
 const accountAvatar = document.getElementById("accountAvatar");
 
 let toastTimer;
@@ -394,7 +396,10 @@ portfolioAvatarInput?.addEventListener("change", async () => {
 
     }
 
-    profileAvatar.src = imageUrl;
+    const portfolio = await loadPortfolio();
+
+    profileAvatar.src =
+    portfolio.profile_image || "assets/profile.jpg";
 
     portfolioAvatarInput.value = "";
 
@@ -683,35 +688,7 @@ signOutButton?.addEventListener("click",async()=>{
   await refreshAccountUI(); goHome(); showAuthToast("Bạn đã đăng xuất.","success");
 });
 /* Version 1.3 — editable About Me cards */
-const defaultInfoCards = [
-  {
-    id: "education",
-    label: "EDUCATION",
-    title: "Trình Độ Học Vấn",
-    text: "Thêm trường học, thành tích, chứng chỉ hoặc mục tiêu học tập của bạn."
-  },
-  {
-    id: "profile",
-    label: "PROFILE",
-    title: "Thông Tin Cá Nhân",
-    text: "Giới thiệu ngắn gọn về bản thân, sở thích và những điều bạn muốn chia sẻ."
-  },
-  {
-    id: "more",
-    label: "MORE",
-    title: "Thông Tin Thêm",
-    text: "Thêm dự án, kỹ năng, câu nói yêu thích hoặc bất kỳ nội dung nào bạn muốn."
-  }
-];
 
-let infoCards = (() => {
-  try {
-    const saved = JSON.parse(localStorage.getItem("bao-info-cards"));
-    return Array.isArray(saved) && saved.length ? saved : defaultInfoCards;
-  } catch {
-    return defaultInfoCards;
-  }
-})();
 
 const infoModal = document.getElementById("infoModal");
 const closeInfoModal = document.getElementById("closeInfoModal");
@@ -724,22 +701,24 @@ const addInfoCard = document.getElementById("addInfoCard");
 
 let editingCardId = null;
 
-function saveInfoCards() {
-  localStorage.setItem("bao-info-cards", JSON.stringify(infoCards));
-}
-
 async function renderInfoCards() {
   const grid = document.querySelector(".about-grid");
   grid.innerHTML = "";
-  const portfolio = await loadPortfolio();
-  if (portfolio.profile_image) {
-    profileAvatar.src = portfolio.profile_image;
-}
+const portfolio = await loadPortfolio();
 
-  if (!portfolio) {
+if (!portfolio) {
     showToast("Không thể tải Portfolio.");
     return;
 }
+
+if (portfolio.profile_image) {
+    profileAvatar.src = portfolio.profile_image;
+}
+heroName.textContent =
+    portfolio.hero_name || "Nguyen Dinh Bao";
+
+heroSubtitle.textContent =
+    portfolio.hero_subtitle || "Student · Learner · Creator";
   const infoCards = [
     {
         id: "education",
@@ -802,17 +781,49 @@ async function openInfoEditor(id) {
   if (!(await isOwner())) {
     showAuthToast("Chỉ Owner mới được chỉnh About Me.", "error");
     return;
-}
-  editingCardId = id;
-  const card = infoCards.find(item => item.id === id);
-  if (!card) return;
+  }
 
-  infoTitleInput.value = card.title;
-  infoTextInput.value = card.text;
-  deleteInfoCard.style.display = infoCards.length > 1 ? "block" : "none";
+  editingCardId = id;
+
+  const portfolio = await loadPortfolio();
+
+  if (!portfolio) {
+    showAuthToast("Không thể tải dữ liệu Portfolio.", "error");
+    return;
+  }
+
+  let title = "";
+  let text = "";
+
+  switch (id) {
+    case "education":
+      title = portfolio.education_title;
+      text = portfolio.education_text;
+      break;
+
+    case "profile":
+      title = portfolio.profile_title;
+      text = portfolio.profile_text;
+      break;
+
+    case "more":
+      title = portfolio.more_title;
+      text = portfolio.more_text;
+      break;
+
+    default:
+      return;
+  }
+
+  infoTitleInput.value = title;
+  infoTextInput.value = text;
+
+  // Không còn chức năng Delete
+  deleteInfoCard.style.display = "none";
 
   infoModal.classList.add("open");
   infoModal.setAttribute("aria-hidden", "false");
+
   setTimeout(() => infoTitleInput.focus(), 50);
 }
 
@@ -859,39 +870,7 @@ if (!ok) {
   showToast("Đã lưu thông tin About Me.");
 });
 
-deleteInfoCard.addEventListener("click", async () => {
-  if (!editingCardId || infoCards.length <= 1) return;
-
-  if (!confirm("Bạn có chắc muốn xóa ô thông tin này?")) return;
-
-  infoCards = infoCards.filter(card => card.id !== editingCardId);
-  saveInfoCards();
-  await renderInfoCards();
-  closeEditor();
-  showToast("Đã xóa ô thông tin.");
-});
-
-addInfoCard.addEventListener("click", async () => {
-  if (!(await isOwner())) {
-    showAuthToast("Chỉ Owner mới được thêm mục.", "error");
-    return;
-}
-  const id = `custom-${Date.now()}`;
-  infoCards.push({
-    id,
-    label: "CUSTOM",
-    title: "Thông tin mới",
-    text: "Thêm nội dung của bạn vào đây."
-  });
-
-  saveInfoCards();
-  await renderInfoCards();
-  await openInfoEditor(id);
-});
-
 renderInfoCards();
-
-
 
 /* Version 2.1 — online Sign In / Sign Up */
 const authModal=document.getElementById("authModal");
