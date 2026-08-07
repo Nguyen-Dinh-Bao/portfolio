@@ -220,6 +220,11 @@ const profileAvatar =
     document.getElementById("profileAvatar");
 const heroName = document.getElementById("heroName");
 const heroSubtitle = document.getElementById("heroSubtitle");
+const facebookLink = document.getElementById("facebookLink");
+const instagramLink = document.getElementById("instagramLink");
+const linkedinLink = document.getElementById("linkedinLink");
+const snapchatLink = document.getElementById("snapchatLink");
+const tiktokLink = document.getElementById("tiktokLink");
 const accountAvatar = document.getElementById("accountAvatar");
 
 let toastTimer;
@@ -276,48 +281,15 @@ async function getCurrentProfile() {
 
   return data;
 }
-async function savePortfolio(cardId, title, text) {
-
-    const update = {};
-
-    if (cardId === "education") {
-        update.education_title = title;
-        update.education_text = text;
-    }
-
-    if (cardId === "profile") {
-        update.profile_title = title;
-        update.profile_text = text;
-    }
-
-    if (cardId === "more") {
-        update.more_title = title;
-        update.more_text = text;
-    }
+async function updatePortfolio(fields) {
 
     const { error } = await supabaseClient
         .from("portfolio")
-        .update(update)
+        .update(fields)
         .eq("id", 1);
 
     if (error) {
-        console.error(error);
-        return false;
-    }
-
-    return true;
-}
-async function savePortfolioImage(imageUrl) {
-
-    const { error } = await supabaseClient
-        .from("portfolio")
-        .update({
-            profile_image: imageUrl
-        })
-        .eq("id", 1);
-
-    if (error) {
-        console.error("Save portfolio image error:", error);
+        console.error("Update Portfolio:", error);
         return false;
     }
 
@@ -385,8 +357,9 @@ portfolioAvatarInput?.addEventListener("change", async () => {
     const imageUrl =
         data.publicUrl + "?t=" + Date.now();
 
-    const saved =
-        await savePortfolioImage(imageUrl);
+    const saved = await updatePortfolio({
+    profile_image: imageUrl
+});
 
     if (!saved) {
 
@@ -719,6 +692,20 @@ heroName.textContent =
 
 heroSubtitle.textContent =
     portfolio.hero_subtitle || "Student · Learner · Creator";
+facebookLink.href =
+    portfolio.facebook || "#";
+
+instagramLink.href =
+    portfolio.instagram || "#";
+
+linkedinLink.href =
+    portfolio.linkedin || "#";
+
+snapchatLink.href =
+    portfolio.snapchat || "#";
+
+tiktokLink.href =
+    portfolio.tiktok || "#";
   const infoCards = [
     {
         id: "education",
@@ -855,11 +842,33 @@ saveInfoEdit.addEventListener("click", async () => {
     return;
   }
 
-const ok = await savePortfolio(
-    editingCardId,
-    title,
-    text
-);
+let fields = {};
+
+switch (editingCardId) {
+
+    case "education":
+        fields = {
+            education_title: title,
+            education_text: text
+        };
+        break;
+
+    case "profile":
+        fields = {
+            profile_title: title,
+            profile_text: text
+        };
+        break;
+
+    case "more":
+        fields = {
+            more_title: title,
+            more_text: text
+        };
+        break;
+}
+
+const ok = await updatePortfolio(fields);
 
 if (!ok) {
     showToast("Không thể lưu dữ liệu.");
