@@ -739,26 +739,18 @@ infoCards.forEach((card, index) => {
     article.dataset.cardId = card.id;
 
     article.innerHTML = `
-      <div class="card-top">
-        <span>${String(index + 1).padStart(2, "0")}</span>
-        <span>${escapeHTML(card.label)}</span>
-      </div>
-      <h2 class="info-title">${escapeHTML(card.title)}</h2>
-      <p class="info-text">${escapeHTML(card.text)}</p>
-      <button class="card-action edit-info owner-only" type="button">
-        Edit <span>↗</span>
-      </button>
-    `;
+  <div class="card-top">
+    <span>${String(index + 1).padStart(2, "0")}</span>
+    <span>${escapeHTML(card.label)}</span>
+  </div>
+
+  <h2 class="info-title">${escapeHTML(card.title)}</h2>
+
+  <p class="info-text">${escapeHTML(card.text)}</p>
+`;
 
     grid.appendChild(article);
 });
-
-  grid.querySelectorAll(".edit-info").forEach(button => {
-    button.addEventListener("click", async () => {
-      const card = button.closest(".info-card");
-      await openInfoEditor(card.dataset.cardId);
-    });
-  });
 }
 
 function escapeHTML(value) {
