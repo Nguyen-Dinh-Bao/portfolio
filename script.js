@@ -1,10 +1,3 @@
-const SUPABASE_URL = "https://fwskrzmivcwauleualio.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_mQpBQfiOkIJNjy4qeqBX4w_7xmnJPhO";
-
-const supabaseClient = supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-);
 const body = document.body;
 const progress = document.getElementById("pageProgress");
 const navbar = document.getElementById("navbar");
