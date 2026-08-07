@@ -497,6 +497,12 @@ const { data: authData, error: authError } =
 
 console.log("AUTH USER ID:", authData?.user?.id);
 console.log("AUTH ERROR:", authError);
+const { data: sessionData } = await supabaseClient.auth.getSession();
+
+console.log(
+  "AUTH ROLE:",
+  sessionData?.session?.user?.role
+);
   if(!f.type.startsWith("image/")) return showAuthToast("Vui lòng chọn file ảnh.","error");
   if(f.size>2*1024*1024)return showAuthToast("Ảnh nên nhỏ hơn 2 MB.","error");
   const ext=f.name.split(".").pop().toLowerCase()||"jpg", path=`${s.user.id}/avatar.${ext}`;
