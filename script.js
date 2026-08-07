@@ -213,20 +213,6 @@ const avatarInput = document.getElementById("avatarInput");
 const profileAvatar = document.getElementById("profileAvatar");
 const accountAvatar = document.getElementById("accountAvatar");
 
-changeAvatar.addEventListener("click", () => avatarInput.click());
-
-avatarInput.addEventListener("change", () => {
-  const file = avatarInput.files[0];
-  if (!file) return;
-
-  if (!file.type.startsWith("image/")) {
-    showToast("Vui lòng chọn một tệp hình ảnh.");
-    return;
-  }
-  const reader = new FileReader();
-  reader.readAsDataURL(file);
-});
-
 let toastTimer;
 function showToast(message) {
   const toast = document.getElementById("toast");
