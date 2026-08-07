@@ -676,7 +676,8 @@ const heroNameInput =
 const heroSubtitleInput =
     document.getElementById("heroSubtitleInput");
 const addInfoCard = document.getElementById("addInfoCard");
-
+const editPortfolioButton =
+    document.getElementById("editPortfolioButton");
 let editingCardId = null;
 
 async function renderInfoCards() {
