@@ -223,27 +223,11 @@ avatarInput.addEventListener("change", () => {
     showToast("Vui lòng chọn một tệp hình ảnh.");
     return;
   }
-
   const reader = new FileReader();
-
-  reader.onload = event => {
-    profileAvatar.src = event.target.result;
-    accountAvatar.src = event.target.result;
-    localStorage.setItem("bao-avatar", event.target.result);
-    showToast("Ảnh đại diện đã được cập nhật trên thiết bị này.");
-  };
-
   reader.readAsDataURL(file);
 });
 
-const savedAvatar = localStorage.getItem("bao-avatar");
-if (savedAvatar) {
-  profileAvatar.src = savedAvatar;
-  accountAvatar.src = savedAvatar;
-}
-
 let toastTimer;
-
 function showToast(message) {
   const toast = document.getElementById("toast");
   toast.textContent = message;
@@ -472,18 +456,44 @@ saveAccount?.addEventListener("click", async () => {
   if (!session) return showAuthToast("Hãy đăng nhập trước khi chỉnh sửa Account.","error");
   const username=accountUsername.value.trim(), email=accountEmail.value.trim(), bio=accountBio.value.trim(), pw=accountPassword.value;
   if (!/^[A-Za-z0-9_.-]{3,30}$/.test(username)) return showAuthToast("Username không hợp lệ.","error");
-  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showAuthToast("Gmail chưa đúng định dạng.","error");
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+  return showAuthToast("Gmail chưa đúng định dạng.","error");
   if (pw && pw.length<6) return showAuthToast("Password phải có ít nhất 6 ký tự.","error");
   const {data: dup,error:dupErr}=await supabaseClient.from("profiles").select("id").eq("username",username).neq("id",session.user.id).maybeSingle();
   if (dupErr) return showAuthToast("Không thể kiểm tra Username.","error");
   if (dup) return showAuthToast("Username đã được sử dụng","error");
-  const {data: updated,error}=await supabaseClient.from("profiles").update({username,email,bio}).eq("id",session.user.id).select("id,username,email,bio,avatar_url").single();
+ const { data: updated, error } = await supabaseClient
+  .from("profiles")
+  .update({
+    username,
+    bio
+  })
+  .eq("id", session.user.id)
+  .select("id,username,email,bio,avatar_url,role")
+  .single();
   if (error) { console.error(error); return showAuthToast("Không thể lưu thông tin Account.","error"); }
+  if (email && email !== session.user.email) {
+  const { error: emailError } = await supabaseClient.auth.updateUser({
+    email: email
+  });
+
+  if (emailError) {
+    console.error(emailError);
+    return showAuthToast(
+      "Username và Bio đã lưu nhưng Gmail chưa cập nhật.",
+      "error"
+    );
+  }
+}
   if (pw) {
+    
     const {error:pe}=await supabaseClient.auth.updateUser({password:pw});
     if (pe) return showAuthToast("Thông tin đã lưu nhưng Password chưa cập nhật.","error");
   }
-  renderSignedInAccount(updated); await refreshAccountUI();
+  renderSignedInAccount({
+  ...updated,
+  email: email
+}); await refreshAccountUI();
 await updatePermissionUI();
   showAuthToast("Đã đồng bộ Account online.","success");
 });
