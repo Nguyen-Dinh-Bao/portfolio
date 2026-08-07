@@ -210,7 +210,14 @@ recommendSend.addEventListener("click", async () => {
 
 const changeAvatar = document.getElementById("changeAvatar");
 const avatarInput = document.getElementById("avatarInput");
-const profileAvatar = document.getElementById("profileAvatar");
+const changePortfolioAvatar =
+    document.getElementById("changePortfolioAvatar");
+
+const portfolioAvatarInput =
+    document.getElementById("portfolioAvatarInput");
+
+const profileAvatar =
+    document.getElementById("profileAvatar");
 const accountAvatar = document.getElementById("accountAvatar");
 
 let toastTimer;
@@ -298,6 +305,86 @@ async function savePortfolio(cardId, title, text) {
 
     return true;
 }
+/* ---------- Portfolio Avatar Upload ---------- */
+
+changePortfolioAvatar?.addEventListener("click", async () => {
+
+    const profile = await getCurrentProfile();
+
+    if (!profile || profile.role !== "owner") {
+        showAuthToast("Chỉ Owner mới có thể thay đổi ảnh Portfolio.", "error");
+        return;
+    }
+
+    portfolioAvatarInput.click();
+
+});
+
+portfolioAvatarInput?.addEventListener("change", async () => {
+
+    const file = portfolioAvatarInput.files?.[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+        showAuthToast("Vui lòng chọn một file ảnh.", "error");
+        return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+        showAuthToast("Ảnh phải nhỏ hơn 2 MB.", "error");
+        return;
+    }
+
+    const ext = file.name.split(".").pop().toLowerCase();
+
+    const path = `profile.${ext}`;
+
+    const { error: uploadError } =
+        await supabaseClient.storage
+            .from("Portfolio")
+            .upload(path, file, {
+                upsert: true,
+                contentType: file.type,
+                cacheControl: "3600"
+            });
+
+    if (uploadError) {
+
+        console.error(uploadError);
+
+        showAuthToast(uploadError.message, "error");
+
+        return;
+
+    }
+
+    const { data } =
+        supabaseClient.storage
+            .from("Portfolio")
+            .getPublicUrl(path);
+
+    const imageUrl =
+        data.publicUrl + "?t=" + Date.now();
+
+    const saved =
+        await savePortfolioImage(imageUrl);
+
+    if (!saved) {
+
+        showAuthToast("Không thể lưu Portfolio Avatar.", "error");
+
+        return;
+
+    }
+
+    profileAvatar.src = imageUrl;
+
+    portfolioAvatarInput.value = "";
+
+    showAuthToast("Đã cập nhật Portfolio Avatar.", "success");
+
+});
 async function loadPortfolio() {
   const { data, error } = await supabaseClient
     .from("portfolio")
@@ -369,6 +456,7 @@ async function updatePermissionUI() {
 }
 function renderSignedInAccount(profile) {
   if (!profile) {
+    changePortfolioAvatar.hidden = true;
     accountUsername.value = "";
     accountPassword.value = "";
     accountEmail.value = "";
@@ -401,6 +489,7 @@ async function refreshAccountUI() {
   const authBtn = document.getElementById("authButton");
   const navAvatar = document.getElementById("navAvatar");
   if (!profile) {
+  changePortfolioAvatar.hidden = true;
    authBtn.hidden = false;
    avatarBtn.hidden = true;
    applyRoleUI("visitor");
@@ -412,7 +501,10 @@ async function refreshAccountUI() {
  navAvatar.src = profile.avatar_url || "assets/profile.jpg";
 
  applyRoleUI(profile.role);
-
+ if (changePortfolioAvatar) {
+    changePortfolioAvatar.hidden =
+        profile.role !== "owner";
+}
  renderSignedInAccount(profile);
 }
 async function loadOwnerFeedback() {
@@ -624,6 +716,9 @@ async function renderInfoCards() {
   const grid = document.querySelector(".about-grid");
   grid.innerHTML = "";
   const portfolio = await loadPortfolio();
+  if (portfolio.profile_image) {
+    profileAvatar.src = portfolio.profile_image;
+}
 
   if (!portfolio) {
     showToast("Không thể tải Portfolio.");

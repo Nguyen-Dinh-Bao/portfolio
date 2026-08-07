@@ -1307,3 +1307,44 @@ body[data-role="owner"] .owner-only{
 .auth-signup-only{
     display:none;
 }
+.avatar-ring{
+    position: relative;
+    overflow: hidden;
+
+    border-radius: 50%;
+    position:relative;
+    overflow:hidden;
+    cursor:pointer;
+}
+
+.change-avatar-button{
+    position:absolute;
+    inset:0;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:rgba(0,0,0,.45);
+    color:#fff;
+
+    border:none;
+
+    opacity:0;
+    transition:.25s;
+
+    font-size:.82rem;
+    font-weight:600;
+
+    backdrop-filter:blur(2px);
+
+    cursor:pointer;
+}
+
+.avatar-ring:hover .change-avatar-button{
+    opacity:1;
+}
+
+.change-avatar-button[hidden]{
+    display:none !important;
+}
