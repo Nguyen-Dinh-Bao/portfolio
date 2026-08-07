@@ -88,7 +88,8 @@ document.querySelectorAll(".settings-tab").forEach(button => {
 const feedbackInput = document.getElementById("feedbackInput");
 const feedbackSend = document.getElementById("feedbackSend");
 const feedbackCounter = document.getElementById("feedbackCounter");
-
+const dashboardTab = document.getElementById("dashboardTab");
+const ownerFeedbackList = document.getElementById("ownerFeedbackList");
 function updateFeedback() {
   const length = feedbackInput.value.trim().length;
   feedbackCounter.textContent = `${length} / 5 ký tự tối thiểu`;
@@ -280,7 +281,12 @@ function applyRoleUI(role) {
 
   const isOwner = currentUserRole === "owner";
   const isUser = currentUserRole === "user";
-
+  if (dashboardTab) {
+  dashboardTab.hidden = !isOwner;
+  }
+  if (isOwner) {
+  renderOwnerFeedback();
+  }
   if (feedbackSend) {
     feedbackSend.disabled = !isUser && !isOwner;
   }
@@ -365,6 +371,40 @@ async function refreshAccountUI() {
  applyRoleUI(profile.role);
 
  renderSignedInAccount(profile);
+}
+async function loadOwnerFeedback() {
+  if (currentUserRole !== "owner") {
+    return [];
+  }
+
+  const { data, error } = await supabaseClient
+    .from("feedback")
+    .select("id,user_id,message,created_at")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    return [];
+  }
+
+  return data || [];
+}
+async function renderOwnerFeedback() {
+  if (!ownerFeedbackList) return;
+
+  const feedbacks = await loadOwnerFeedback();
+
+  if (!feedbacks.length) {
+    ownerFeedbackList.innerHTML = "<p>Chưa có Feedback nào.</p>";
+    return;
+  }
+
+  ownerFeedbackList.innerHTML = feedbacks.map(item => `
+    <article class="feedback-box">
+      <p>${escapeHTML(item.message)}</p>
+      <small>${new Date(item.created_at).toLocaleString("vi-VN")}</small>
+    </article>
+  `).join("");
 }
 saveAccount?.addEventListener("click", async () => {
   const session=await getSession();

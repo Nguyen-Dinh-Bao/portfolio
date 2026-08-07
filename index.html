@@ -198,6 +198,9 @@
           <div class="sidebar-title">Setting<br><em>& Account.</em></div>
           <button class="settings-tab active" data-panel="appearance">Appearance <span>01</span></button>
           <button class="settings-tab" data-panel="account">Account <span>02</span></button>
+          <button class="settings-tab" data-panel="dashboard" id="dashboardTab" hidden>
+            Dashboard <span>03</span>
+          </button>
         </aside>
 
         <div class="settings-main">
@@ -274,6 +277,23 @@
               Thông tin ở phiên bản này được lưu bằng <code>localStorage</code> trên trình duyệt hiện tại.
               Đây chưa phải hệ thống tài khoản online thật.
             </p>
+            <div id="dashboard" class="settings-panel reveal">
+  <p class="eyebrow">OWNER / 03</p>
+  <h2>Dashboard</h2>
+
+  <div class="dashboard-section">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">FEEDBACK</p>
+        <h3>Recent Feedback</h3>
+      </div>
+    </div>
+
+    <div id="ownerFeedbackList">
+      <p>Đang tải Feedback...</p>
+    </div>
+  </div>
+</div>
           </div>
         </div>
       </div>
