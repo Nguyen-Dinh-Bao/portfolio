@@ -1219,6 +1219,11 @@ nav {
   font-weight: 700;
   white-space: nowrap;
 }
+.auth-area .auth-button[hidden] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
 
 .auth-area .auth-button:hover {
   background: var(--surface-strong);

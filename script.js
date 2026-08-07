@@ -267,6 +267,24 @@ async function getCurrentProfile() {
 
   return data;
 }
+async function loadPortfolio() {
+  const { data, error } = await supabaseClient
+    .from("portfolio")
+    .select("*")
+    .eq("id", 1)
+    .single();
+
+  if (error) {
+    console.error("Portfolio load error:", error);
+    return null;
+  }
+
+  return data;
+}
+(async () => {
+    const portfolio = await loadPortfolio();
+    console.log("PORTFOLIO:", portfolio);
+})();
 let currentUserRole = "visitor";
 
 function applyRoleUI(role) {
