@@ -305,6 +305,22 @@ async function savePortfolio(cardId, title, text) {
 
     return true;
 }
+async function savePortfolioImage(imageUrl) {
+
+    const { error } = await supabaseClient
+        .from("portfolio")
+        .update({
+            profile_image: imageUrl
+        })
+        .eq("id", 1);
+
+    if (error) {
+        console.error("Save portfolio image error:", error);
+        return false;
+    }
+
+    return true;
+}
 /* ---------- Portfolio Avatar Upload ---------- */
 
 changePortfolioAvatar?.addEventListener("click", async () => {
