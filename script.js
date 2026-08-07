@@ -506,7 +506,13 @@ avatarInput?.addEventListener("change",async()=>{
   if(f.size>2*1024*1024)return showAuthToast("Ảnh nên nhỏ hơn 2 MB.","error");
   const ext=f.name.split(".").pop().toLowerCase()||"jpg", path=`${s.user.id}/avatar.${ext}`;
   const {error:ue}=await supabaseClient.storage.from("avatars").upload(path,f,{upsert:true,contentType:f.type,cacheControl:"3600"});
-  if(ue){console.error(ue);return showAuthToast("Upload avatar thất bại. Kiểm tra Storage policy.","error");}
+  if (ue) {
+  console.error("Avatar upload error:", ue);
+  return showAuthToast(
+    `Upload thất bại: ${ue.message || "Unknown error"}`,
+    "error"
+  );
+}
   const {data:pd}=supabaseClient.storage.from("avatars").getPublicUrl(path);
   const avatarUrl=pd.publicUrl+"?t="+Date.now();
   const {data:updated,error}=await supabaseClient.from("profiles").update({avatar_url:avatarUrl}).eq("id",s.user.id).select("id,username,email,bio,avatar_url").single();
