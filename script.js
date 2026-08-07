@@ -778,7 +778,7 @@ addInfoCard.addEventListener("click", async () => {
   await openInfoEditor(id);
 });
 
-await renderInfoCards();
+renderInfoCards();
 
 
 
