@@ -586,7 +586,16 @@ authForm.addEventListener("submit",async e=>{
     if(!/^[A-Za-z0-9_.-]{3,30}$/.test(identity))return showAuthToast("Username không hợp lệ.","error");
     if(password.length<6)return showAuthToast("Password phải có ít nhất 6 ký tự.","error");
     if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()))return showAuthToast("Gmail chưa đúng định dạng.","error");
-    const {data,error}=await supabaseClient.auth.signUp({email:email.trim(),password,options:{data:{username:identity}}});
+    const {data,error}=await supabaseClient.auth.signUp({
+    email:email.trim(),
+    password,
+    options:{
+        emailRedirectTo:"https://nguyen-dinh-bao.github.io/portfolio/",
+        data:{
+            username:identity
+        }
+    }
+});
     if(error){
     console.error(error);
     return showAuthToast(error.message,"error");
