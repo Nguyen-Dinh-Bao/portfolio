@@ -670,6 +670,11 @@ const saveInfoEdit = document.getElementById("saveInfoEdit");
 const deleteInfoCard = document.getElementById("deleteInfoCard");
 const infoTitleInput = document.getElementById("infoTitleInput");
 const infoTextInput = document.getElementById("infoTextInput");
+const heroNameInput =
+    document.getElementById("heroNameInput");
+
+const heroSubtitleInput =
+    document.getElementById("heroSubtitleInput");
 const addInfoCard = document.getElementById("addInfoCard");
 
 let editingCardId = null;
