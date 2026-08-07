@@ -90,6 +90,7 @@ const feedbackSend = document.getElementById("feedbackSend");
 const feedbackCounter = document.getElementById("feedbackCounter");
 const dashboardTab = document.getElementById("dashboardTab");
 const ownerFeedbackList = document.getElementById("ownerFeedbackList");
+const ownerRecommendList = document.getElementById("ownerRecommendList");
 function updateFeedback() {
   const length = feedbackInput.value.trim().length;
   feedbackCounter.textContent = `${length} / 5 ký tự tối thiểu`;
@@ -308,7 +309,8 @@ function applyRoleUI(role) {
   }
   if (isOwner) {
   renderOwnerFeedback();
-  }
+  renderOwnerRecommendations();
+}
   if (feedbackSend) {
     feedbackSend.disabled = !isUser && !isOwner;
   }
@@ -410,6 +412,43 @@ async function loadOwnerFeedback() {
   }
 
   return data || [];
+}
+async function loadOwnerRecommendations() {
+  if (currentUserRole !== "owner") {
+    return [];
+  }
+
+  const { data, error } = await supabaseClient
+    .from("recommendations")
+    .select("id,user_id,book,media,story,explanation,created_at")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    return [];
+  }
+
+  return data || [];
+}
+async function renderOwnerRecommendations() {
+  if (!ownerRecommendList) return;
+
+  const recommendations = await loadOwnerRecommendations();
+
+  if (!recommendations.length) {
+    ownerRecommendList.innerHTML = "<p>Chưa có Recommend nào.</p>";
+    return;
+  }
+
+  ownerRecommendList.innerHTML = recommendations.map(item => `
+    <article class="feedback-box">
+      <p><strong>Book:</strong> ${escapeHTML(item.book || "—")}</p>
+      <p><strong>Media:</strong> ${escapeHTML(item.media || "—")}</p>
+      <p><strong>Story:</strong> ${escapeHTML(item.story || "—")}</p>
+      <p><strong>Explanation:</strong> ${escapeHTML(item.explanation || "—")}</p>
+      <small>${new Date(item.created_at).toLocaleString("vi-VN")}</small>
+    </article>
+  `).join("");
 }
 async function renderOwnerFeedback() {
   if (!ownerFeedbackList) return;
