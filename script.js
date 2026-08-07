@@ -748,7 +748,7 @@ if (!ok) {
   showToast("Đã lưu thông tin About Me.");
 });
 
-deleteInfoCard.addEventListener("click", () => {
+deleteInfoCard.addEventListener("click", async () => {
   if (!editingCardId || infoCards.length <= 1) return;
 
   if (!confirm("Bạn có chắc muốn xóa ô thông tin này?")) return;
