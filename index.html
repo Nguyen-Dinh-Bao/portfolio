@@ -333,12 +333,30 @@
           <input id="authIdentity" type="text" autocomplete="username" placeholder="Username">
         </label>
 
+        <label class="modal-field auth-signup-only">
+          <span>Email</span>
+          <input
+              id="authEmail"
+              type="email"
+              autocomplete="email"
+              placeholder="Email">
+        </label>
+
         <label class="modal-field">
           <span>Password</span>
           <div class="password-wrap auth-password-wrap">
             <input id="authPassword" type="password" autocomplete="current-password" placeholder="Password">
             <button id="authPasswordToggle" type="button" aria-label="Show password">◉</button>
           </div>
+        </label>
+        <label class="modal-field auth-signup-only">
+            <span>Confirm Password</span>
+
+            <input
+                id="authConfirmPassword"
+                type="password"
+                autocomplete="new-password"
+                placeholder="Confirm Password">
         </label>
 
         <p id="authHint" class="auth-hint">Đăng nhập bằng Username hoặc Gmail đã lưu trong tài khoản.</p>

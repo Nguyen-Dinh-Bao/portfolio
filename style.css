@@ -1299,3 +1299,6 @@ body[data-role="user"] .owner-only{
 body[data-role="owner"] .owner-only{
     display:initial;
 }
+.auth-signup-only{
+    display:none;
+}
