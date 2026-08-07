@@ -778,6 +778,10 @@ async function openInfoEditor(id) {
   editingCardId = id;
 
   const portfolio = await loadPortfolio();
+  heroNameInput.value = portfolio.hero_name || "";
+
+    heroSubtitleInput.value =
+    portfolio.hero_subtitle || "";
 
   if (!portfolio) {
     showAuthToast("Không thể tải dữ liệu Portfolio.", "error");
