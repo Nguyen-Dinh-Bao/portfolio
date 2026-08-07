@@ -44,12 +44,27 @@
         </div>
 
         <div class="avatar-wrap">
-          <div class="avatar-ring">
-            <img id="profileAvatar" class="profile-avatar" src="assets/profile.jpg"
-                 alt="Nguyen Dinh Bao"
-                 onerror="this.src='https://placehold.co/400x400/f0f0ec/777?text=BAO'">
-          </div>
-        </div>
+    <div class="avatar-ring">
+        <img id="profileAvatar"
+             class="profile-avatar"
+             src="assets/profile.jpg"
+             alt="Nguyen Dinh Bao">
+
+        <button
+            id="changePortfolioAvatar"
+            class="owner-only change-avatar-button"
+            type="button"
+            hidden>
+            Change Photo ↗
+        </button>
+
+        <input
+            id="portfolioAvatarInput"
+            type="file"
+            accept="image/*"
+            hidden>
+    </div>
+</div>
 
         <h1>Nguyen Dinh Bao</h1>
         <p class="hero-description">Student · Learner · Creator</p>
