@@ -97,7 +97,11 @@ function updateFeedback() {
 
 feedbackInput.addEventListener("input", updateFeedback);
 
-feedbackSend.addEventListener("click", () => {
+feedbackSend.addEventListener("click", async () => {
+  if (await isVisitor()) {
+    showAuthToast("Bạn cần đăng nhập để gửi Feedback.", "error");
+    return;
+}
   const message = feedbackInput.value.trim();
   if (message.length < 5) return;
 
@@ -125,7 +129,11 @@ function updateRecommend() {
 
 recommendFields.forEach(field => field.addEventListener("input", updateRecommend));
 
-recommendSend.addEventListener("click", () => {
+recommendSend.addEventListener("click", async () => {
+  if (await isVisitor()) {
+    showAuthToast("Bạn cần đăng nhập để gửi Recommend.", "error");
+    return;
+}
   const total = recommendFields.reduce((sum, field) => sum + field.value.trim().length, 0);
   if (total < 5) return;
 
@@ -217,9 +225,30 @@ async function getCurrentProfile() {
   const session = await getSession();
   if (!session) return null;
   const { data, error } = await supabaseClient.from("profiles")
-    .select("id,username,email,bio,avatar_url").eq("id", session.user.id).maybeSingle();
+    .select("id,username,email,bio,avatar_url,role").eq("id", session.user.id).maybeSingle();
   if (error) { console.error(error); return null; }
   return data;
+}
+async function getCurrentRole() {
+    const profile = await getCurrentProfile();
+    if (!profile) return "visitor";
+    return profile.role || "user";
+}
+
+async function isOwner() {
+    return (await getCurrentRole()) === "owner";
+}
+
+async function isUser() {
+    return (await getCurrentRole()) !== "user";
+}
+
+async function isVisitor() {
+    return (await getCurrentRole()) === "visitor";
+}
+
+async function updatePermissionUI() {
+    document.body.dataset.role = await getCurrentRole();
 }
 function renderSignedInAccount(profile) {
   if (!profile) {
@@ -238,7 +267,12 @@ function renderSignedInAccount(profile) {
   accountPassword.value = "";
   accountEmail.value = profile.email || "";
   accountBio.value = profile.bio || "";
-  accountNamePreview.textContent = profile.username || "Account";
+  const badge = profile.role === "owner"
+    ? "👑"
+    : "👤";
+
+accountNamePreview.textContent =
+    `${badge} ${profile.username || "Account"}`;
   accountAvatar.src = profile.avatar_url || "assets/profile.jpg";
   accountStatus?.classList.add("signed-in");
   if (accountStatusText) accountStatusText.textContent = `Đã đăng nhập · ${profile.username}`;
@@ -256,6 +290,7 @@ async function refreshAccountUI() {
   authBtn.hidden=true; avatarBtn.hidden=false;
   navAvatar.src=profile.avatar_url || "assets/profile.jpg";
   renderSignedInAccount(profile);
+  await updatePermissionUI();
 }
 saveAccount?.addEventListener("click", async () => {
   const session=await getSession();
@@ -274,6 +309,7 @@ saveAccount?.addEventListener("click", async () => {
     if (pe) return showAuthToast("Thông tin đã lưu nhưng Password chưa cập nhật.","error");
   }
   renderSignedInAccount(updated); await refreshAccountUI();
+await updatePermissionUI();
   showAuthToast("Đã đồng bộ Account online.","success");
 });
 resetAccount?.addEventListener("click",async()=>{renderSignedInAccount(await getCurrentProfile());});
@@ -359,7 +395,7 @@ function renderInfoCards() {
       </div>
       <h2 class="info-title">${escapeHTML(card.title)}</h2>
       <p class="info-text">${escapeHTML(card.text)}</p>
-      <button class="card-action edit-info" type="button">Edit <span>↗</span></button>
+      <button class="card-action edit-info owner-only" type="button">Edit <span>↗</span></button>
     `;
 
     grid.appendChild(article);
@@ -368,7 +404,7 @@ function renderInfoCards() {
   grid.querySelectorAll(".edit-info").forEach(button => {
     button.addEventListener("click", () => {
       const card = button.closest(".info-card");
-      openInfoEditor(card.dataset.cardId);
+      await openInfoEditor(card.dataset.cardId);
     });
   });
 }
@@ -382,7 +418,11 @@ function escapeHTML(value) {
     .replaceAll("'", "&#039;");
 }
 
-function openInfoEditor(id) {
+async function openInfoEditor(id) {
+  if (!(await isOwner())) {
+    showAuthToast("Chỉ Owner mới được chỉnh About Me.", "error");
+    return;
+}
   editingCardId = id;
   const card = infoCards.find(item => item.id === id);
   if (!card) return;
@@ -448,7 +488,11 @@ deleteInfoCard.addEventListener("click", () => {
   showToast("Đã xóa ô thông tin.");
 });
 
-addInfoCard.addEventListener("click", () => {
+addInfoCard.addEventListener("click", async () => {
+  if (!(await isOwner())) {
+    showAuthToast("Chỉ Owner mới được thêm mục.", "error");
+    return;
+}
   const id = `custom-${Date.now()}`;
   infoCards.push({
     id,
@@ -459,7 +503,7 @@ addInfoCard.addEventListener("click", () => {
 
   saveInfoCards();
   renderInfoCards();
-  openInfoEditor(id);
+  await openInfoEditor(id);
 });
 
 renderInfoCards();
@@ -534,6 +578,12 @@ authForm.addEventListener("submit",async e=>{
 });
 function updateAuthUI(){refreshAccountUI();}
 (async()=>{
-  supabaseClient.auth.onAuthStateChange(()=>{setTimeout(refreshAccountUI,0);});
-  await refreshAccountUI();
+  supabaseClient.auth.onAuthStateChange(()=>{
+    setTimeout(async()=>{
+        await refreshAccountUI();
+        await updatePermissionUI();
+    },0);
+  },0);
+   await refreshAccountUI();
+  await updatePermissionUI();
 })();

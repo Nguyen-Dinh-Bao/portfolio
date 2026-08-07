@@ -1288,3 +1288,14 @@ nav {
     width: 100%;
   }
 }
+body[data-role="visitor"] .owner-only{
+    display:none !important;
+}
+
+body[data-role="user"] .owner-only{
+    display:none !important;
+}
+
+body[data-role="owner"] .owner-only{
+    display:initial;
+}
