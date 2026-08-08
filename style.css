@@ -1963,3 +1963,112 @@ body[data-role="owner"] .owner-only{
   font-size: .72rem;
   font-weight: 700;
 }
+/* ==========================================
+   MY JOURNEY — COMMENTS
+========================================== */
+
+.journey-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.journey-comment-toggle {
+  border: 0;
+  background: transparent;
+  color: var(--text);
+
+  padding: 5px 8px;
+
+  font: inherit;
+  font-size: .72rem;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    opacity .2s ease,
+    transform .2s ease;
+}
+
+.journey-comment-toggle:hover {
+  opacity: .65;
+  transform: translateY(-1px);
+}
+
+.journey-comments {
+  width: 260px;
+
+  margin-top: 14px;
+  padding-top: 12px;
+
+  border-top: 1px solid var(--line);
+
+  text-align: left;
+}
+
+.journey-comment-list {
+  display: grid;
+  gap: 8px;
+
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.journey-comment {
+  padding: 8px 10px;
+
+  border: 1px solid var(--line);
+  border-radius: 8px;
+
+  font-size: .72rem;
+  line-height: 1.5;
+}
+
+.journey-comment-author {
+  display: block;
+
+  margin-bottom: 3px;
+
+  font-size: .68rem;
+  font-weight: 700;
+}
+
+.journey-comment-text {
+  color: var(--muted);
+}
+
+.journey-comment-form {
+  margin-top: 10px;
+}
+
+.journey-comment-input {
+  width: 100%;
+  min-height: 70px;
+
+  resize: vertical;
+
+  border: 1px solid var(--line);
+  border-radius: 8px;
+
+  padding: 9px;
+
+  background: transparent;
+  color: var(--text);
+
+  font: inherit;
+  font-size: .72rem;
+
+  outline: none;
+}
+
+.journey-comment-input:focus {
+  border-color: var(--text);
+}
+
+.journey-comment-submit {
+  margin-top: 8px;
+
+  width: 100%;
+}

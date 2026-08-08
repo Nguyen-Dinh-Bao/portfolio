@@ -1399,26 +1399,71 @@ const confirmJourneyUpload =
 
       </div>
 
-      <div class="journey-caption">
+<div class="journey-caption">
+
   <p>
     ${escapeHTML(item.caption || "")}
   </p>
 
-  <button
-    class="journey-like-button"
-    type="button"
-    data-id="${item.id}"
-    aria-label="Like this image">
+  <div class="journey-actions">
 
-    <span class="journey-heart">♡</span>
+    <button
+      class="journey-like-button"
+      type="button"
+      data-id="${item.id}"
+      aria-label="Like this image">
 
-    <span
-      class="journey-like-count"
-      data-like-count="${item.id}">
-      0
-    </span>
+      <span class="journey-heart">♡</span>
 
-  </button>
+      <span
+        class="journey-like-count"
+        data-like-count="${item.id}">
+        0
+      </span>
+
+    </button>
+
+    <button
+      class="journey-comment-toggle"
+      type="button"
+      data-id="${item.id}">
+      Comment
+    </button>
+
+  </div>
+
+  <div
+    class="journey-comments"
+    data-comments="${item.id}"
+    hidden>
+
+    <div
+      class="journey-comment-list"
+      data-comment-list="${item.id}">
+    </div>
+
+    <div
+      class="journey-comment-form"
+      data-comment-form="${item.id}"
+      hidden>
+
+      <textarea
+        class="journey-comment-input"
+        data-comment-input="${item.id}"
+        maxlength="500"
+        placeholder="Viết bình luận..."></textarea>
+
+      <button
+        class="dark-button journey-comment-submit"
+        type="button"
+        data-comment-submit="${item.id}">
+        Comment <span>↗</span>
+      </button>
+
+    </div>
+
+  </div>
+
 </div>
     `;
 
@@ -1569,6 +1614,87 @@ async function updateJourneyLikeStates() {
     }
 
   }
+}
+async function canCommentOnJourney() {
+
+  const session =
+    await getSession();
+
+  return !!session?.user;
+}
+async function loadJourneyComments(journeyId) {
+
+  const list =
+    document.querySelector(
+      `[data-comment-list="${journeyId}"]`
+    );
+
+  if (!list) return;
+
+  list.innerHTML = "";
+
+  const { data, error } =
+    await supabaseClient
+      .from("journey_comments")
+      .select("*")
+      .eq("journey_id", journeyId)
+      .order("created_at", {
+        ascending: true
+      });
+
+  if (error) {
+
+    console.error(
+      "Journey comments load error:",
+      error
+    );
+
+    list.innerHTML = `
+      <p class="journey-empty">
+        Không thể tải bình luận.
+      </p>
+    `;
+
+    return;
+  }
+
+  if (!data || data.length === 0) {
+
+    list.innerHTML = `
+      <p class="journey-empty">
+        Chưa có bình luận.
+      </p>
+    `;
+
+    return;
+  }
+
+  data.forEach((comment) => {
+
+    const article =
+      document.createElement("article");
+
+    article.className =
+      "journey-comment";
+
+    article.innerHTML = `
+      <span class="journey-comment-author">
+        ${escapeHTML(
+          comment.username ||
+          "User"
+        )}
+      </span>
+
+      <span class="journey-comment-text">
+        ${escapeHTML(
+          comment.content || ""
+        )}
+      </span>
+    `;
+
+    list.appendChild(article);
+
+  });
 }
 journeyGallery?.addEventListener(
   "click",
