@@ -894,19 +894,6 @@ function switchPortfolioCMSTab(tab) {
 
 }
 
-
-portfolioHeroTab?.addEventListener("click", () => {
-  switchPortfolioCMSTab("hero");
-});
-
-portfolioAboutTab?.addEventListener("click", () => {
-  switchPortfolioCMSTab("about");
-});
-
-portfolioContactTab?.addEventListener("click", () => {
-  switchPortfolioCMSTab("contact");
-});
-
 function closePortfolioCMSModal() {
 
   portfolioCMSModal.classList.remove("open");
@@ -1269,3 +1256,49 @@ function updateAuthUI(){refreshAccountUI();}
    await refreshAccountUI();
   await updatePermissionUI();
 })();
+function activatePortfolioTab(tab) {
+
+  const tabs = [
+    portfolioHeroTab,
+    portfolioAboutTab,
+    portfolioContactTab
+  ];
+
+  const panels = [
+    portfolioHeroPanel,
+    portfolioAboutPanel,
+    portfolioContactPanel
+  ];
+
+  tabs.forEach(tabButton => {
+    tabButton?.classList.remove("active");
+  });
+
+  panels.forEach(panel => {
+    panel?.classList.remove("portfolio-panel-active");
+  });
+
+  let activeTab = null;
+  let activePanel = null;
+
+  if (tab === "hero") {
+    activeTab = portfolioHeroTab;
+    activePanel = portfolioHeroPanel;
+  }
+
+  if (tab === "about") {
+    activeTab = portfolioAboutTab;
+    activePanel = portfolioAboutPanel;
+  }
+
+  if (tab === "contact") {
+    activeTab = portfolioContactTab;
+    activePanel = portfolioContactPanel;
+  }
+
+  if (!activeTab || !activePanel) return;
+
+  activeTab.classList.add("active");
+
+  activePanel.classList.add("portfolio-panel-active");
+}

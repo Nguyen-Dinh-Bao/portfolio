@@ -1476,3 +1476,46 @@ body[data-role="owner"] .owner-only{
     transform: translateY(0);
   }
 }
+/* ==========================================
+   Portfolio CMS — Final Tab Animation
+========================================== */
+
+.portfolio-panel {
+  display: none;
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.portfolio-panel.portfolio-panel-active {
+  display: block;
+  animation: portfolioCmsPanelIn 0.35s ease both;
+}
+
+@keyframes portfolioCmsPanelIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.portfolio-tab {
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.2s ease;
+}
+
+.portfolio-tab.active {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.portfolio-tab:not(.active) {
+  background: transparent;
+  color: var(--text);
+}
