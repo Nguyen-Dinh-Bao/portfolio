@@ -1519,3 +1519,64 @@ body[data-role="owner"] .owner-only{
   background: transparent;
   color: var(--text);
 }
+/* ==========================================
+   MY JOURNEY — HOMEPAGE ENTRY
+========================================== */
+
+.journey-entry-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 55vh;
+}
+
+.journey-entry {
+  width: 100%;
+  text-align: center;
+  cursor: pointer;
+}
+
+.journey-entry h2 {
+  margin: 10px 0 20px;
+  font-size: clamp(3rem, 8vw, 7rem);
+  line-height: .95;
+  letter-spacing: -.06em;
+}
+
+.journey-entry h2 em {
+  font-style: normal;
+}
+
+.journey-entry-link {
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  padding: 8px 0;
+
+  font: inherit;
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+
+  cursor: pointer;
+
+  transition:
+    opacity .25s ease,
+    transform .25s ease;
+}
+
+.journey-entry-link span {
+  display: inline-block;
+  margin-left: 5px;
+  transition: transform .25s ease;
+}
+
+.journey-entry-link:hover {
+  opacity: .65;
+  transform: translateY(-2px);
+}
+
+.journey-entry-link:hover span {
+  transform: translate(3px, -3px);
+}
