@@ -895,21 +895,17 @@ function switchPortfolioCMSTab(tab) {
 }
 
 
-portfolioHeroTab?.addEventListener(
-  "click",
-  () => switchPortfolioCMSTab("hero")
-);
+portfolioHeroTab?.addEventListener("click", () => {
+  switchPortfolioCMSTab("hero");
+});
 
-portfolioAboutTab?.addEventListener(
-  "click",
-  () => switchPortfolioCMSTab("about")
-);
+portfolioAboutTab?.addEventListener("click", () => {
+  switchPortfolioCMSTab("about");
+});
 
-portfolioContactTab?.addEventListener(
-  "click",
-  () => switchPortfolioCMSTab("contact")
-);
-
+portfolioContactTab?.addEventListener("click", () => {
+  switchPortfolioCMSTab("contact");
+});
 
 function closePortfolioCMSModal() {
 
