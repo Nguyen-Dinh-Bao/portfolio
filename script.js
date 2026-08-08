@@ -1397,8 +1397,6 @@ const confirmJourneyUpload =
           alt="${escapeHTML(item.caption || "My Journey image")}"
           loading="lazy">
 
-        <span class="journey-dot"></span>
-
       </div>
 
       <p class="journey-caption">

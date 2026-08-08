@@ -1675,27 +1675,6 @@ body[data-role="owner"] .owner-only{
 }
 
 /* Timeline dot */
-
-.journey-dot {
-  position: absolute;
-
-  left: 50%;
-  top: 50%;
-
-  width: 10px;
-  height: 10px;
-
-  transform: translate(-50%, -50%);
-
-  border-radius: 50%;
-
-  background: var(--text);
-
-  border: 3px solid var(--bg);
-
-  z-index: 3;
-}
-
 .journey-caption {
   width: 260px;
 
@@ -1903,4 +1882,8 @@ body[data-role="owner"] .owner-only{
   gap: 10px;
 
   margin-top: 14px;
+}
+/* Không hiện timeline khi chỉ có 1 ảnh */
+.journey-gallery:has(.journey-item:only-child)::before {
+  display: none;
 }
