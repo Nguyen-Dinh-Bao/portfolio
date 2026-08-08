@@ -1298,71 +1298,6 @@ function activatePortfolioTab(tab) {
 
   activePanel.classList.add("portfolio-panel-active");
 }
-openJourney?.addEventListener(
-  "click",
-  async () => {
-
-    await loadJourneyImages();
-
-    journeyModal?.classList.add("open");
-
-    journeyModal?.setAttribute(
-      "aria-hidden",
-      "false"
-    );
-
-  }
-);
-closeJourneyModal?.addEventListener(
-  "click",
-  () => {
-
-    journeyModal?.classList.remove("open");
-
-    journeyModal?.setAttribute(
-      "aria-hidden",
-      "true"
-    );
-
-  }
-);
-journeyModal?.addEventListener(
-  "click",
-  (event) => {
-
-    if (event.target === journeyModal) {
-
-      journeyModal.classList.remove("open");
-
-      journeyModal.setAttribute(
-        "aria-hidden",
-        "true"
-      );
-
-    }
-
-  }
-);
-document.addEventListener(
-  "keydown",
-  (event) => {
-
-    if (
-      event.key === "Escape" &&
-      journeyModal?.classList.contains("open")
-    ) {
-
-      journeyModal.classList.remove("open");
-
-      journeyModal.setAttribute(
-        "aria-hidden",
-        "true"
-      );
-
-    }
-
-  }
-);
 /* ==========================================
    2.5.6.3 — MY JOURNEY GALLERY
 ========================================== */
@@ -1452,3 +1387,68 @@ const openJourney =
 
   });
 }
+openJourney?.addEventListener(
+  "click",
+  async () => {
+
+    await loadJourneyImages();
+
+    journeyModal?.classList.add("open");
+
+    journeyModal?.setAttribute(
+      "aria-hidden",
+      "false"
+    );
+
+  }
+);
+closeJourneyModal?.addEventListener(
+  "click",
+  () => {
+
+    journeyModal?.classList.remove("open");
+
+    journeyModal?.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+  }
+);
+journeyModal?.addEventListener(
+  "click",
+  (event) => {
+
+    if (event.target === journeyModal) {
+
+      journeyModal.classList.remove("open");
+
+      journeyModal.setAttribute(
+        "aria-hidden",
+        "true"
+      );
+
+    }
+
+  }
+);
+document.addEventListener(
+  "keydown",
+  (event) => {
+
+    if (
+      event.key === "Escape" &&
+      journeyModal?.classList.contains("open")
+    ) {
+
+      journeyModal.classList.remove("open");
+
+      journeyModal.setAttribute(
+        "aria-hidden",
+        "true"
+      );
+
+    }
+
+  }
+);
