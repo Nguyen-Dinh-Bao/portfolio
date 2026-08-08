@@ -1741,7 +1741,16 @@ body[data-role="owner"] .owner-only{
   padding-top: 24px;
   border-top: 1px solid var(--line);
 }
+.journey-image-input {
+  position: absolute;
 
+  width: 1px;
+  height: 1px;
+
+  opacity: 0;
+
+  pointer-events: none;
+}
 .journey-owner-header {
   display: flex;
   align-items: center;

@@ -2750,14 +2750,7 @@ journeyOwnerList?.addEventListener(
 
   }
 );
-addJourneyImage?.addEventListener(
-  "click",
-  () => {
-
-    journeyImageInput?.click();
-
-  }
-);
+ 
 journeyImageInput?.addEventListener(
   "change",
   () => {
