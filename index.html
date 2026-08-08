@@ -438,7 +438,206 @@
       </div>
     </div>
   </div>
+<div class="modal-backdrop" id="portfolioCMSModal" aria-hidden="true">
+  <div class="edit-modal portfolio-cms-modal"
+       role="dialog"
+       aria-modal="true"
+       aria-labelledby="portfolioCMSTitle">
 
+    <div class="modal-header">
+      <div>
+        <p class="eyebrow">KINZ / PORTFOLIO</p>
+        <h2 id="portfolioCMSTitle">Edit Portfolio</h2>
+      </div>
+
+      <button
+        class="modal-close"
+        id="closePortfolioCMS"
+        type="button"
+        aria-label="Close">
+        ×
+      </button>
+    </div>
+
+    <div class="portfolio-tabs">
+
+      <button
+        id="portfolioHeroTab"
+        class="portfolio-tab active"
+        type="button">
+        Hero
+      </button>
+
+      <button
+        id="portfolioAboutTab"
+        class="portfolio-tab"
+        type="button">
+        About
+      </button>
+
+      <button
+        id="portfolioContactTab"
+        class="portfolio-tab"
+        type="button">
+        Contact
+      </button>
+
+    </div>
+
+    <div id="portfolioCMSContent">
+
+      <!-- HERO -->
+      <div id="portfolioHeroPanel" class="portfolio-panel">
+
+        <label class="modal-field">
+          <span>Hero Name</span>
+          <input
+            id="cmsHeroName"
+            type="text"
+            maxlength="80"
+            placeholder="Nguyen Dinh Bao">
+        </label>
+
+        <label class="modal-field">
+          <span>Hero Subtitle</span>
+          <input
+            id="cmsHeroSubtitle"
+            type="text"
+            maxlength="120"
+            placeholder="Student · Learner · Creator">
+        </label>
+
+      </div>
+
+      <!-- ABOUT -->
+      <div id="portfolioAboutPanel"
+           class="portfolio-panel"
+           hidden>
+
+        <label class="modal-field">
+          <span>Education Title</span>
+          <input
+            id="cmsEducationTitle"
+            type="text"
+            maxlength="80">
+        </label>
+
+        <label class="modal-field">
+          <span>Education Content</span>
+          <textarea
+            id="cmsEducationText"
+            maxlength="500"></textarea>
+        </label>
+
+        <label class="modal-field">
+          <span>Profile Title</span>
+          <input
+            id="cmsProfileTitle"
+            type="text"
+            maxlength="80">
+        </label>
+
+        <label class="modal-field">
+          <span>Profile Content</span>
+          <textarea
+            id="cmsProfileText"
+            maxlength="500"></textarea>
+        </label>
+
+        <label class="modal-field">
+          <span>More Title</span>
+          <input
+            id="cmsMoreTitle"
+            type="text"
+            maxlength="80">
+        </label>
+
+        <label class="modal-field">
+          <span>More Content</span>
+          <textarea
+            id="cmsMoreText"
+            maxlength="500"></textarea>
+        </label>
+
+      </div>
+
+      <!-- CONTACT -->
+      <div id="portfolioContactPanel"
+           class="portfolio-panel"
+           hidden>
+
+        <label class="modal-field">
+          <span>Facebook</span>
+          <input
+            id="cmsFacebook"
+            type="url"
+            placeholder="https://facebook.com/...">
+        </label>
+
+        <label class="modal-field">
+          <span>Instagram</span>
+          <input
+            id="cmsInstagram"
+            type="url"
+            placeholder="https://instagram.com/...">
+        </label>
+
+        <label class="modal-field">
+          <span>LinkedIn</span>
+          <input
+            id="cmsLinkedin"
+            type="url"
+            placeholder="https://linkedin.com/...">
+        </label>
+
+        <label class="modal-field">
+          <span>Snapchat</span>
+          <input
+            id="cmsSnapchat"
+            type="url"
+            placeholder="https://snapchat.com/...">
+        </label>
+
+        <label class="modal-field">
+          <span>TikTok</span>
+          <input
+            id="cmsTiktok"
+            type="url"
+            placeholder="https://tiktok.com/...">
+        </label>
+
+        <label class="modal-field">
+          <span>Email</span>
+          <input
+            id="cmsEmail"
+            type="email"
+            placeholder="example@gmail.com">
+        </label>
+
+      </div>
+
+    </div>
+
+    <div class="modal-actions">
+
+      <button
+        id="cancelPortfolioCMS"
+        class="light-button"
+        type="button">
+        Hủy
+      </button>
+
+      <button
+        id="savePortfolioCMS"
+        class="dark-button"
+        type="button">
+        Lưu thay đổi <span>↗</span>
+      </button>
+
+    </div>
+
+  </div>
+</div>
 
   <div class="modal-backdrop" id="authModal" aria-hidden="true">
     <div class="edit-modal auth-modal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
