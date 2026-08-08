@@ -1410,14 +1410,66 @@ body[data-role="owner"] .owner-only{
   font-weight: 700;
   transition: .2s ease;
 }
+.portfolio-tab {
+  position: relative;
+  z-index: 21;
+
+  flex: 1;
+
+  border: 1px solid var(--line);
+  border-radius: 999px;
+
+  padding: 10px 14px;
+
+  background: transparent;
+  color: var(--text);
+
+  cursor: pointer;
+  pointer-events: auto;
+
+  font: inherit;
+  font-size: .75rem;
+  font-weight: 700;
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.2s ease,
+    border-color 0.25s ease;
+}
+.portfolio-tab:hover {
+  transform: translateY(-1px);
+}
+
+.portfolio-tab:active {
+  transform: translateY(0);
+}
 
 .portfolio-tab.active {
   background: var(--text);
   color: var(--bg);
 }
+.portfolio-tab.active {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
 
 .portfolio-panel {
   display: block;
+}
+.portfolio-panel {
+  animation: portfolioPanelIn 0.25s ease;
+}
+
+@keyframes portfolioPanelIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .portfolio-panel[hidden] {
