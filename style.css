@@ -1996,36 +1996,36 @@ body[data-role="owner"] .owner-only{
 .journey-comment-icon {
   position: relative;
 
-  display: block;
+  display: inline-block;
 
-  width: 21px;
-  height: 17px;
+  width: 19px;
+  height: 14px;
 
   border: 2px solid currentColor;
-  border-radius: 50%;
+  border-radius: 4px;
 
   box-sizing: border-box;
 }
 
+/* Đuôi bong bóng thoại */
 .journey-comment-icon::after {
   content: "";
 
   position: absolute;
 
-  right: 0;
-  bottom: -5px;
+  left: 3px;
+  bottom: -6px;
 
-  width: 7px;
-  height: 7px;
-
-  border-right: 2px solid currentColor;
-  border-bottom: 2px solid currentColor;
+  width: 6px;
+  height: 6px;
 
   background: var(--bg);
 
-  transform: rotate(25deg);
-}
+  border-left: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
 
+  transform: skewY(-25deg) rotate(-12deg);
+}
 .journey-comment-toggle:hover {
   transform: translateY(-1px);
   opacity: 0.7;
