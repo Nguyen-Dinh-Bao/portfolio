@@ -1975,6 +1975,11 @@ body[data-role="owner"] .owner-only{
 }
 
 .journey-comment-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
   border: 0;
   background: transparent;
   color: var(--text);
@@ -1982,19 +1987,48 @@ body[data-role="owner"] .owner-only{
   padding: 5px 8px;
 
   font: inherit;
-  font-size: .72rem;
-  font-weight: 700;
-
   cursor: pointer;
 
   transition:
-    opacity .2s ease,
-    transform .2s ease;
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+.journey-comment-icon {
+  position: relative;
+
+  display: block;
+
+  width: 21px;
+  height: 17px;
+
+  border: 2px solid currentColor;
+  border-radius: 50%;
+
+  box-sizing: border-box;
+}
+
+.journey-comment-icon::after {
+  content: "";
+
+  position: absolute;
+
+  right: 0;
+  bottom: -5px;
+
+  width: 7px;
+  height: 7px;
+
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+
+  background: var(--bg);
+
+  transform: rotate(25deg);
 }
 
 .journey-comment-toggle:hover {
-  opacity: .65;
   transform: translateY(-1px);
+  opacity: 0.7;
 }
 
 .journey-comments {
