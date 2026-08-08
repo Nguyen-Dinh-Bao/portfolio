@@ -1536,6 +1536,46 @@ async function loadJourneyLikeCounts() {
 
     });
 }
+async function loadJourneyCommentCounts() {
+
+  const { data, error } =
+    await supabaseClient
+      .from("journey_comments")
+      .select("journey_id");
+
+  if (error) {
+
+    console.error(
+      "Journey comment count error:",
+      error
+    );
+
+    return;
+  }
+
+  const counts = {};
+
+  (data || []).forEach((comment) => {
+
+    counts[comment.journey_id] =
+      (counts[comment.journey_id] || 0) + 1;
+
+  });
+
+  document
+    .querySelectorAll(
+      "[data-comment-count]"
+    )
+    .forEach((counter) => {
+
+      const journeyId =
+        counter.dataset.commentCount;
+
+      counter.textContent =
+        counts[journeyId] || 0;
+
+    });
+}
 function getJourneyVisitorId() {
 
   let visitorId =
@@ -2008,6 +2048,8 @@ console.log(
 input.value = "";
 
 await loadJourneyComments(journeyId);
+
+await loadJourneyCommentCounts();
 
       if (error) {
 
@@ -2982,6 +3024,8 @@ openJourney?.addEventListener(
     await loadJourneyImages();
 
     await loadJourneyLikeCounts();
+    
+    await loadJourneyCommentCounts();
 
     await updateJourneyLikeStates();
 
