@@ -1429,7 +1429,26 @@ const confirmJourneyUpload =
   data-id="${item.id}"
   aria-label="View comments">
 
-  <span class="journey-comment-icon">♡</span>
+  <span
+    class="journey-comment-icon"
+    aria-hidden="true">
+
+    <svg
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg">
+
+      <path
+        d="M20 11.5C20 15.09 16.42 18 12 18C10.83 18 9.72 17.8 8.75 17.45L4 20L5.35 16.05C4.5 14.82 4 13.23 4 11.5C4 7.91 7.58 5 12 5C16.42 5 20 7.91 20 11.5Z"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round">
+      </path>
+
+    </svg>
+
+  </span>
 
   <span
     class="journey-comment-count"

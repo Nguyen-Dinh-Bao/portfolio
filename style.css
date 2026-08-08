@@ -1994,37 +1994,23 @@ body[data-role="owner"] .owner-only{
     opacity 0.2s ease;
 }
 .journey-comment-icon {
-  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
-  display: inline-block;
+  width: 20px;
+  height: 20px;
 
-  width: 19px;
-  height: 14px;
-
-  border: 2px solid currentColor;
-  border-radius: 4px;
-
-  box-sizing: border-box;
+  flex-shrink: 0;
 }
 
-/* Đuôi bong bóng thoại */
-.journey-comment-icon::after {
-  content: "";
+.journey-comment-icon svg {
+  display: block;
 
-  position: absolute;
+  width: 20px;
+  height: 20px;
 
-  left: 3px;
-  bottom: -6px;
-
-  width: 6px;
-  height: 6px;
-
-  background: var(--bg);
-
-  border-left: 2px solid currentColor;
-  border-bottom: 2px solid currentColor;
-
-  transform: skewY(-25deg) rotate(-12deg);
+  color: currentColor;
 }
 .journey-comment-toggle:hover {
   transform: translateY(-1px);
