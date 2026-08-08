@@ -1298,8 +1298,6 @@ function activatePortfolioTab(tab) {
 
   activePanel.classList.add("portfolio-panel-active");
 }
-const openJourney = document.getElementById("openJourney");
-
 openJourney?.addEventListener(
   "click",
   async () => {
