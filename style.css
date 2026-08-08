@@ -1993,6 +1993,16 @@ body[data-role="owner"] .owner-only{
     transform 0.2s ease,
     opacity 0.2s ease;
 }
+.journey-comment-toggle {
+  transition:
+    transform .2s ease,
+    opacity .2s ease;
+}
+
+.journey-comment-toggle:hover {
+  transform: translateY(-2px);
+  opacity: .7;
+}
 .journey-comment-icon {
   display: inline-flex;
   align-items: center;
@@ -2037,6 +2047,19 @@ body[data-role="owner"] .owner-only{
   border-top: 1px solid var(--line);
 
   text-align: left;
+
+  animation: journeyCommentsOpen .22s ease;
+}
+@keyframes journeyCommentsOpen {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .journey-comment-list {
