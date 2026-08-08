@@ -749,16 +749,6 @@ const savePortfolioCMS =
   );
 
 });
-
-const portfolioHeroTab =
-  document.getElementById("portfolioHeroTab");
-
-const portfolioAboutTab =
-  document.getElementById("portfolioAboutTab");
-
-const portfolioContactTab =
-  document.getElementById("portfolioContactTab");
-
 const portfolioHeroPanel =
   document.getElementById("portfolioHeroPanel");
 
