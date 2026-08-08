@@ -1580,3 +1580,176 @@ body[data-role="owner"] .owner-only{
 .journey-entry-link:hover span {
   transform: translate(3px, -3px);
 }
+/* ==========================================
+   MY JOURNEY — GALLERY
+========================================== */
+
+.journey-modal {
+  width: min(1100px, 92vw);
+  max-height: 88vh;
+}
+
+.journey-gallery {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  gap: 0;
+
+  min-height: 430px;
+
+  padding: 40px 20px;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  scroll-behavior: smooth;
+}
+
+/* Horizontal journey line */
+
+.journey-gallery::before {
+  content: "";
+
+  position: absolute;
+
+  left: 30px;
+  right: 30px;
+  top: 50%;
+
+  height: 1px;
+
+  background: var(--line);
+
+  pointer-events: none;
+}
+
+/* Individual journey item */
+
+.journey-item {
+  position: relative;
+
+  flex: 0 0 280px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 16px;
+
+  margin-right: 70px;
+
+  z-index: 1;
+}
+
+.journey-item:last-child {
+  margin-right: 0;
+}
+
+.journey-image-wrap {
+  position: relative;
+
+  width: 260px;
+  height: 330px;
+
+  overflow: hidden;
+
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.journey-image {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  display: block;
+
+  transition: transform .4s ease;
+}
+
+.journey-image-wrap:hover .journey-image {
+  transform: scale(1.035);
+}
+
+/* Timeline dot */
+
+.journey-dot {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  width: 10px;
+  height: 10px;
+
+  transform: translate(-50%, -50%);
+
+  border-radius: 50%;
+
+  background: var(--text);
+
+  border: 3px solid var(--bg);
+
+  z-index: 3;
+}
+
+.journey-caption {
+  width: 260px;
+
+  text-align: center;
+
+  font-size: .78rem;
+  line-height: 1.6;
+
+  color: var(--muted);
+}
+
+.journey-empty {
+  width: 100%;
+
+  text-align: center;
+
+  color: var(--muted);
+}
+
+.journey-empty span {
+  display: block;
+
+  color: var(--text);
+
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.journey-empty p {
+  margin-top: 8px;
+
+  font-size: .8rem;
+}
+
+@media (max-width: 650px) {
+
+  .journey-gallery {
+    min-height: 360px;
+
+    padding: 30px 10px;
+  }
+
+  .journey-item {
+    flex-basis: 220px;
+    margin-right: 45px;
+  }
+
+  .journey-image-wrap {
+    width: 210px;
+    height: 270px;
+  }
+
+  .journey-caption {
+    width: 210px;
+  }
+
+}

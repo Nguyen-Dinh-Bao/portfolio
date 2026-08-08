@@ -1300,6 +1300,157 @@ function activatePortfolioTab(tab) {
 }
 const openJourney = document.getElementById("openJourney");
 
-openJourney?.addEventListener("click", () => {
-  showAuthToast("My Journey đang được xây dựng.", "success");
-});
+openJourney?.addEventListener(
+  "click",
+  async () => {
+
+    await loadJourneyImages();
+
+    journeyModal?.classList.add("open");
+
+    journeyModal?.setAttribute(
+      "aria-hidden",
+      "false"
+    );
+
+  }
+);
+closeJourneyModal?.addEventListener(
+  "click",
+  () => {
+
+    journeyModal?.classList.remove("open");
+
+    journeyModal?.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+  }
+);
+journeyModal?.addEventListener(
+  "click",
+  (event) => {
+
+    if (event.target === journeyModal) {
+
+      journeyModal.classList.remove("open");
+
+      journeyModal.setAttribute(
+        "aria-hidden",
+        "true"
+      );
+
+    }
+
+  }
+);
+document.addEventListener(
+  "keydown",
+  (event) => {
+
+    if (
+      event.key === "Escape" &&
+      journeyModal?.classList.contains("open")
+    ) {
+
+      journeyModal.classList.remove("open");
+
+      journeyModal.setAttribute(
+        "aria-hidden",
+        "true"
+      );
+
+    }
+
+  }
+);
+/* ==========================================
+   2.5.6.3 — MY JOURNEY GALLERY
+========================================== */
+
+const journeyModal =
+  document.getElementById("journeyModal");
+
+const closeJourneyModal =
+  document.getElementById("closeJourneyModal");
+
+const journeyGallery =
+  document.getElementById("journeyGallery");
+
+const openJourney =
+  document.getElementById("openJourney");
+  async function loadJourneyImages() {
+
+  if (!journeyGallery) return;
+
+  journeyGallery.innerHTML = "";
+
+  const { data, error } = await supabaseClient
+    .from("journey_images")
+    .select("*")
+    .order("sort_order", {
+      ascending: true
+    })
+    .order("created_at", {
+      ascending: true
+    });
+
+  if (error) {
+
+    console.error(
+      "Journey images load error:",
+      error
+    );
+
+    journeyGallery.innerHTML = `
+      <div class="journey-empty">
+        <span>Unable to load My Journey.</span>
+        <p>Please try again later.</p>
+      </div>
+    `;
+
+    return;
+  }
+
+  if (!data || data.length === 0) {
+
+    journeyGallery.innerHTML = `
+      <div class="journey-empty">
+        <span>No journey yet.</span>
+        <p>My journey will appear here.</p>
+      </div>
+    `;
+
+    return;
+  }
+
+  data.forEach((item) => {
+
+    const article =
+      document.createElement("article");
+
+    article.className = "journey-item";
+
+    article.innerHTML = `
+      <div class="journey-image-wrap">
+
+        <img
+          class="journey-image"
+          src="${escapeHTML(item.image_url)}"
+          alt="${escapeHTML(item.caption || "My Journey image")}"
+          loading="lazy">
+
+        <span class="journey-dot"></span>
+
+      </div>
+
+      <p class="journey-caption">
+        ${escapeHTML(item.caption || "")}
+      </p>
+    `;
+
+    journeyGallery.appendChild(article);
+
+  });
+}
