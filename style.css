@@ -1454,17 +1454,21 @@ body[data-role="owner"] .owner-only{
   color: var(--bg);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
 }
-.portfolio-panel[hidden] {
-  display: none;
-}
 .portfolio-panel {
-  animation: portfolioPanelIn 0.35s ease both;
+  display: none;
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.portfolio-panel.active {
+  display: block;
+  animation: portfolioPanelIn 0.3s ease forwards;
 }
 
 @keyframes portfolioPanelIn {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(10px);
   }
 
   to {

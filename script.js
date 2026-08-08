@@ -867,43 +867,30 @@ function switchPortfolioCMSTab(tab) {
   portfolioAboutTab.classList.remove("active");
   portfolioContactTab.classList.remove("active");
 
-  portfolioHeroPanel.hidden = true;
-  portfolioAboutPanel.hidden = true;
-  portfolioContactPanel.hidden = true;
-
-  let activePanel = null;
+  portfolioHeroPanel.classList.remove("active");
+  portfolioAboutPanel.classList.remove("active");
+  portfolioContactPanel.classList.remove("active");
 
   if (tab === "hero") {
 
     portfolioHeroTab.classList.add("active");
-    activePanel = portfolioHeroPanel;
+    portfolioHeroPanel.classList.add("active");
 
   }
 
   if (tab === "about") {
 
     portfolioAboutTab.classList.add("active");
-    activePanel = portfolioAboutPanel;
+    portfolioAboutPanel.classList.add("active");
 
   }
 
   if (tab === "contact") {
 
     portfolioContactTab.classList.add("active");
-    activePanel = portfolioContactPanel;
+    portfolioContactPanel.classList.add("active");
 
   }
-
-  if (!activePanel) return;
-
-  activePanel.hidden = false;
-
-  activePanel.style.animation = "none";
-
-  requestAnimationFrame(() => {
-    activePanel.style.animation =
-      "portfolioPanelIn 0.35s ease both";
-  });
 
 }
 
