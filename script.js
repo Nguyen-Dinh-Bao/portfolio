@@ -871,26 +871,39 @@ function switchPortfolioCMSTab(tab) {
   portfolioAboutPanel.hidden = true;
   portfolioContactPanel.hidden = true;
 
+  let activePanel = null;
+
   if (tab === "hero") {
 
     portfolioHeroTab.classList.add("active");
-    portfolioHeroPanel.hidden = false;
+    activePanel = portfolioHeroPanel;
 
   }
 
   if (tab === "about") {
 
     portfolioAboutTab.classList.add("active");
-    portfolioAboutPanel.hidden = false;
+    activePanel = portfolioAboutPanel;
 
   }
 
   if (tab === "contact") {
 
     portfolioContactTab.classList.add("active");
-    portfolioContactPanel.hidden = false;
+    activePanel = portfolioContactPanel;
 
   }
+
+  if (!activePanel) return;
+
+  activePanel.hidden = false;
+
+  activePanel.style.animation = "none";
+
+  requestAnimationFrame(() => {
+    activePanel.style.animation =
+      "portfolioPanelIn 0.35s ease both";
+  });
 
 }
 

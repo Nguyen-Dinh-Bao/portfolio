@@ -1432,32 +1432,43 @@ body[data-role="owner"] .owner-only{
 .portfolio-tab:active {
   transform: translateY(0);
 }
+.portfolio-tab.active {
+  background: var(--text);
+  color: var(--bg);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
 
+  animation: portfolioTabIn 0.2s ease;
+}
+
+@keyframes portfolioTabIn {
+  from {
+    transform: scale(0.97);
+  }
+
+  to {
+    transform: scale(1);
+  }
+}
 .portfolio-tab.active {
   background: var(--text);
   color: var(--bg);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
 }
-
-.portfolio-panel {
-  display: block;
+.portfolio-panel[hidden] {
+  display: none;
 }
 .portfolio-panel {
-  animation: portfolioPanelIn 0.25s ease;
+  animation: portfolioPanelIn 0.35s ease both;
 }
 
 @keyframes portfolioPanelIn {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(12px);
   }
 
   to {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-.portfolio-panel[hidden] {
-  display: none;
 }
