@@ -1633,6 +1633,10 @@ async function loadJourneyComments(journeyId) {
 
   list.innerHTML = "";
 
+  /* ==========================================
+     LOAD COMMENTS
+  ========================================== */
+
   const { data, error } =
     await supabaseClient
       .from("journey_comments")
@@ -1641,10 +1645,7 @@ async function loadJourneyComments(journeyId) {
         journey_id,
         user_id,
         content,
-        created_at,
-        profiles (
-          username
-        )
+        created_at
       `)
       .eq("journey_id", journeyId)
       .order("created_at", {
@@ -1678,6 +1679,56 @@ async function loadJourneyComments(journeyId) {
     return;
   }
 
+
+  /* ==========================================
+     LOAD USERNAMES SEPARATELY
+  ========================================== */
+
+  const userIds = [
+    ...new Set(
+      data
+        .map(comment => comment.user_id)
+        .filter(Boolean)
+    )
+  ];
+
+  let profilesMap = {};
+
+  if (userIds.length > 0) {
+
+    const {
+      data: profiles,
+      error: profilesError
+    } = await supabaseClient
+      .from("profiles")
+      .select("id, username")
+      .in("id", userIds);
+
+    if (profilesError) {
+
+      console.error(
+        "Journey comment profiles error:",
+        profilesError
+      );
+
+    } else {
+
+      (profiles || []).forEach(profile => {
+
+        profilesMap[profile.id] =
+          profile.username || "User";
+
+      });
+
+    }
+
+  }
+
+
+  /* ==========================================
+     CURRENT USER / OWNER
+  ========================================== */
+
   const session =
     await getSession();
 
@@ -1686,6 +1737,11 @@ async function loadJourneyComments(journeyId) {
 
   const owner =
     await isOwner();
+
+
+  /* ==========================================
+     RENDER COMMENTS
+  ========================================== */
 
   data.forEach((comment) => {
 
@@ -1696,7 +1752,7 @@ async function loadJourneyComments(journeyId) {
       "journey-comment";
 
     const username =
-      comment.profiles?.username ||
+      profilesMap[comment.user_id] ||
       "User";
 
     const canEdit =
@@ -1705,7 +1761,9 @@ async function loadJourneyComments(journeyId) {
     const canDelete =
       canEdit || owner;
 
+
     article.innerHTML = `
+
       <div class="journey-comment-content">
 
         <span class="journey-comment-author">
@@ -1713,7 +1771,9 @@ async function loadJourneyComments(journeyId) {
         </span>
 
         <span class="journey-comment-text">
-          ${escapeHTML(comment.content || "")}
+          ${escapeHTML(
+            comment.content || ""
+          )}
         </span>
 
       </div>
@@ -1753,6 +1813,7 @@ async function loadJourneyComments(journeyId) {
           `
           : ""
       }
+
     `;
 
     list.appendChild(article);
