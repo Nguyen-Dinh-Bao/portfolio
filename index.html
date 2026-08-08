@@ -19,6 +19,7 @@
 
     <nav class="nav-links" id="navLinks" aria-label="Main navigation">
       <a class="nav-link active" href="#about">About Me</a>
+      <a class="nav-link" href="#journey">My Journey</a>
       <a class="nav-link" href="#contact">Contact Me</a>
       <a class="nav-link" href="#feedback">Feedback Me</a>
       <a class="nav-link" href="#recommend">Recommend Me</a>
@@ -123,6 +124,126 @@
 </div>
       </div>
     </section>
+<section id="journey" class="section journey-entry-section">
+  <div class="journey-entry reveal" id="journeyEntry">
+
+    <p class="eyebrow">MY JOURNEY</p>
+
+    <h2>My <em>Journey.</em></h2>
+
+    <button
+      id="openJourney"
+      class="journey-entry-link"
+      type="button">
+      Click to See <span>↗</span>
+    </button>
+
+  </div>
+</section>
+<div
+  class="modal-backdrop"
+  id="journeyModal"
+  aria-hidden="true">
+
+  <div
+    class="edit-modal journey-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="journeyModalTitle">
+
+    <div class="modal-header">
+
+      <div>
+        <p class="eyebrow">KINZ / MY JOURNEY</p>
+        <h2 id="journeyModalTitle">My Journey.</h2>
+      </div>
+
+      <button
+        class="modal-close"
+        id="closeJourneyModal"
+        type="button"
+        aria-label="Close">
+        ×
+      </button>
+
+    </div>
+
+    <div
+      class="journey-gallery"
+      id="journeyGallery">
+
+      <div class="journey-empty">
+        <span>No journey yet.</span>
+        <p>My journey will appear here.</p>
+      </div>
+
+    </div>
+<div
+  id="journeyOwnerControls"
+  class="journey-owner-controls owner-only"
+  hidden>
+
+  <div class="journey-owner-header">
+    <div>
+      <p class="eyebrow">OWNER / MY JOURNEY</p>
+      <h3>Manage Journey</h3>
+    </div>
+
+    <button
+      id="addJourneyImage"
+      class="dark-button"
+      type="button">
+      + Add Image
+    </button>
+  </div>
+
+  <input
+    id="journeyImageInput"
+    type="file"
+    accept="image/*"
+    hidden>
+<div
+  id="journeyUploadForm"
+  class="journey-upload-form"
+  hidden>
+
+  <label class="modal-field">
+    <span>Caption</span>
+    <textarea
+      id="journeyCaptionInput"
+      maxlength="300"
+      placeholder="Viết chú thích cho ảnh..."></textarea>
+  </label>
+
+  <div class="journey-upload-actions">
+
+    <button
+      id="cancelJourneyUpload"
+      class="light-button"
+      type="button">
+      Hủy
+    </button>
+
+    <button
+      id="confirmJourneyUpload"
+      class="dark-button"
+      type="button">
+      Upload <span>↗</span>
+    </button>
+
+  </div>
+
+</div>
+  <div
+    id="journeyOwnerList"
+    class="journey-owner-list">
+  </div>
+
+</div>
+
+  </div>
+
+</div>
 
     <section id="contact" class="section content-section">
       <div class="section-heading reveal">
@@ -368,33 +489,6 @@
         </div>
         <button class="modal-close" id="closeInfoModal" type="button" aria-label="Close">×</button>
       </div>
-<div class="portfolio-tabs">
-
-<button
-  id="portfolioHeroTab"
-  class="portfolio-tab active"
-  type="button"
-  onclick="activatePortfolioTab('hero')">
-  Hero
-</button>
-
-<button
-  id="portfolioAboutTab"
-  class="portfolio-tab"
-  type="button"
-  onclick="activatePortfolioTab('about')">
-  About
-</button>
-
-<button
-  id="portfolioContactTab"
-  class="portfolio-tab"
-  type="button"
-  onclick="activatePortfolioTab('contact')">
-  Contact
-</button>
-
-</div>
 <div id="heroFields">
 
   <label class="modal-field">
@@ -470,7 +564,7 @@
   id="portfolioAboutTab"
   class="portfolio-tab"
   type="button"
-  onclick="switchPortfolioCMSTab('about')">
+  onclick="activatePortfolioTab('about')">
   About
 </button>
 
@@ -478,7 +572,7 @@
   id="portfolioContactTab"
   class="portfolio-tab"
   type="button"
-  onclick="switchPortfolioCMSTab('contact')">
+  onclick="activatePortfolioTab('contact')">
   Contact
 </button>
     </div>
@@ -486,7 +580,7 @@
     <div id="portfolioCMSContent">
 
       <!-- HERO -->
-      <div id="portfolioHeroPanel" class="portfolio-panel">
+      <div id="portfolioHeroPanel" class="portfolio-panel portfolio-panel-active">
 
         <label class="modal-field">
           <span>Hero Name</span>
