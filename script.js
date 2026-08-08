@@ -1324,6 +1324,18 @@ const journeyImageInput =
 
 const journeyOwnerList =
   document.getElementById("journeyOwnerList");
+  const journeyUploadForm =
+  document.getElementById("journeyUploadForm");
+
+const journeyCaptionInput =
+  document.getElementById("journeyCaptionInput");
+
+const cancelJourneyUpload =
+  document.getElementById("cancelJourneyUpload");
+
+const confirmJourneyUpload =
+  document.getElementById("confirmJourneyUpload");
+
   async function loadJourneyImages() {
 
   if (!journeyGallery) return;
@@ -1503,6 +1515,273 @@ async function renderJourneyOwnerList() {
   });
 
 }
+addJourneyImage?.addEventListener(
+  "click",
+  async () => {
+
+    if (!(await isOwner())) {
+      showAuthToast(
+        "Chỉ Owner mới được thêm ảnh.",
+        "error"
+      );
+      return;
+    }
+
+    journeyImageInput?.click();
+
+  }
+);
+journeyImageInput?.addEventListener(
+  "change",
+  () => {
+
+    const file =
+      journeyImageInput.files?.[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+
+      showAuthToast(
+        "Vui lòng chọn một tệp hình ảnh.",
+        "error"
+      );
+
+      journeyImageInput.value = "";
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+
+      showAuthToast(
+        "Ảnh không được vượt quá 10 MB.",
+        "error"
+      );
+
+      journeyImageInput.value = "";
+      return;
+    }
+
+    journeyCaptionInput.value = "";
+
+    journeyUploadForm.hidden = false;
+
+    setTimeout(() => {
+      journeyCaptionInput.focus();
+    }, 50);
+
+  }
+);
+cancelJourneyUpload?.addEventListener(
+  "click",
+  () => {
+
+    journeyImageInput.value = "";
+
+    journeyCaptionInput.value = "";
+
+    journeyUploadForm.hidden = true;
+
+  }
+);
+confirmJourneyUpload?.addEventListener(
+  "click",
+  async () => {
+
+    if (!(await isOwner())) {
+
+      showAuthToast(
+        "Chỉ Owner mới được thêm ảnh.",
+        "error"
+      );
+
+      return;
+    }
+
+    const file =
+      journeyImageInput.files?.[0];
+
+    if (!file) {
+
+      showAuthToast(
+        "Bạn chưa chọn ảnh.",
+        "error"
+      );
+
+      return;
+    }
+
+    const caption =
+      journeyCaptionInput.value.trim();
+
+    if (caption.length > 300) {
+
+      showAuthToast(
+        "Caption quá dài.",
+        "error"
+      );
+
+      return;
+    }
+
+    confirmJourneyUpload.disabled = true;
+
+    try {
+
+      const session =
+        await getSession();
+
+      if (!session) {
+
+        showAuthToast(
+          "Phiên đăng nhập đã hết hạn.",
+          "error"
+        );
+
+        return;
+      }
+
+      const userId =
+        session.user.id;
+
+      const extension =
+        file.name.split(".").pop()?.toLowerCase() || "jpg";
+
+      const uniqueName =
+        `${crypto.randomUUID()}.${extension}`;
+
+      const storagePath =
+        `${userId}/${uniqueName}`;
+
+      const { error: uploadError } =
+        await supabaseClient
+          .storage
+          .from("Journey")
+          .upload(
+            storagePath,
+            file,
+            {
+              cacheControl: "3600",
+              upsert: false,
+              contentType: file.type
+            }
+          );
+
+      if (uploadError) {
+
+        console.error(
+          "Journey upload error:",
+          uploadError
+        );
+
+        showAuthToast(
+          "Upload ảnh thất bại.",
+          "error"
+        );
+
+        return;
+      }
+
+      const { data: publicData } =
+        supabaseClient
+          .storage
+          .from("Journey")
+          .getPublicUrl(storagePath);
+
+      const imageUrl =
+        publicData?.publicUrl;
+
+      if (!imageUrl) {
+
+        showAuthToast(
+          "Không lấy được URL ảnh.",
+          "error"
+        );
+
+        return;
+      }
+
+      const { data: existingImages } =
+        await supabaseClient
+          .from("journey_images")
+          .select("sort_order")
+          .order("sort_order", {
+            ascending: false
+          })
+          .limit(1);
+
+      const nextOrder =
+        existingImages?.length
+          ? (existingImages[0].sort_order || 0) + 1
+          : 0;
+
+      const { error: insertError } =
+        await supabaseClient
+          .from("journey_images")
+          .insert({
+            image_url: imageUrl,
+            storage_path: storagePath,
+            caption: caption,
+            sort_order: nextOrder
+          });
+
+      if (insertError) {
+
+        console.error(
+          "Journey database error:",
+          insertError
+        );
+
+        // Nếu database insert thất bại,
+        // xóa file vừa upload để tránh file rác.
+        await supabaseClient
+          .storage
+          .from("Journey")
+          .remove([storagePath]);
+
+        showAuthToast(
+          "Không thể lưu thông tin ảnh.",
+          "error"
+        );
+
+        return;
+      }
+
+      showAuthToast(
+        "Đã thêm ảnh vào My Journey.",
+        "success"
+      );
+
+      journeyImageInput.value = "";
+
+      journeyCaptionInput.value = "";
+
+      journeyUploadForm.hidden = true;
+
+      await loadJourneyImages();
+
+      await renderJourneyOwnerList();
+
+    } catch (error) {
+
+      console.error(
+        "Journey upload unexpected error:",
+        error
+      );
+
+      showAuthToast(
+        "Đã xảy ra lỗi khi upload ảnh.",
+        "error"
+      );
+
+    } finally {
+
+      confirmJourneyUpload.disabled = false;
+
+    }
+
+  }
+);
 openJourney?.addEventListener(
   "click",
   async () => {

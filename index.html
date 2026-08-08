@@ -202,7 +202,38 @@
     type="file"
     accept="image/*"
     hidden>
+<div
+  id="journeyUploadForm"
+  class="journey-upload-form"
+  hidden>
 
+  <label class="modal-field">
+    <span>Caption</span>
+    <textarea
+      id="journeyCaptionInput"
+      maxlength="300"
+      placeholder="Viết chú thích cho ảnh..."></textarea>
+  </label>
+
+  <div class="journey-upload-actions">
+
+    <button
+      id="cancelJourneyUpload"
+      class="light-button"
+      type="button">
+      Hủy
+    </button>
+
+    <button
+      id="confirmJourneyUpload"
+      class="dark-button"
+      type="button">
+      Upload <span>↗</span>
+    </button>
+
+  </div>
+
+</div>
   <div
     id="journeyOwnerList"
     class="journey-owner-list">
