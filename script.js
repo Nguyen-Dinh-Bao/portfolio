@@ -1423,13 +1423,21 @@ const confirmJourneyUpload =
 
     </button>
 
-    <button
-      class="journey-comment-toggle"
-      type="button"
-      data-id="${item.id}">
-      Comment
-    </button>
+<button
+  class="journey-comment-toggle"
+  type="button"
+  data-id="${item.id}"
+  aria-label="View comments">
 
+  <span class="journey-comment-icon">♡</span>
+
+  <span
+    class="journey-comment-count"
+    data-comment-count="${item.id}">
+    0
+  </span>
+
+</button>
   </div>
 
   <div
