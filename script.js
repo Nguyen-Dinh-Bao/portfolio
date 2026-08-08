@@ -2752,15 +2752,7 @@ journeyOwnerList?.addEventListener(
 );
 addJourneyImage?.addEventListener(
   "click",
-  async () => {
-
-    if (!(await isOwner())) {
-      showAuthToast(
-        "Chỉ Owner mới được thêm ảnh.",
-        "error"
-      );
-      return;
-    }
+  () => {
 
     journeyImageInput?.click();
 
