@@ -2010,7 +2010,18 @@ body[data-role="owner"] .owner-only{
   width: 20px;
   height: 20px;
 
-  color: currentColor;
+  color: var(--text);
+  stroke: var(--text);
+  opacity: 1;
+}
+.journey-comment-toggle {
+  visibility: visible;
+  opacity: 1;
+}
+
+.journey-comment-toggle .journey-comment-icon {
+  visibility: visible;
+  opacity: 1;
 }
 .journey-comment-toggle:hover {
   transform: translateY(-1px);
