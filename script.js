@@ -1934,14 +1934,41 @@ journeyGallery?.addEventListener(
 
     try {
 
-      const { error } =
-        await supabaseClient
-          .from("journey_comments")
-          .insert({
-            journey_id: journeyId,
-            user_id: session.user.id,
-            content: content
-          });
+     const { data: insertedComment, error: insertError } =
+  await supabaseClient
+    .from("journey_comments")
+    .insert({
+      journey_id: journeyId,
+      user_id: session.user.id,
+      content: content
+    })
+    .select()
+    .single();
+
+if (insertError) {
+
+  console.error(
+    "Journey comment INSERT error:",
+    insertError
+  );
+
+  showAuthToast(
+    insertError.message ||
+    "Không thể gửi bình luận.",
+    "error"
+  );
+
+  return;
+}
+
+console.log(
+  "Journey comment inserted:",
+  insertedComment
+);
+
+input.value = "";
+
+await loadJourneyComments(journeyId);
 
       if (error) {
 
