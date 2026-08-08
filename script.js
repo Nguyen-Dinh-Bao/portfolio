@@ -1536,6 +1536,44 @@ async function loadJourneyLikeCounts() {
 
     });
 }
+async function loadJourneyCommentCounts() {
+
+  const { data, error } =
+    await supabaseClient
+      .from("journey_comments")
+      .select("journey_id");
+
+  if (error) {
+
+    console.error(
+      "Journey comment count error:",
+      error
+    );
+
+    return;
+  }
+
+  const counts = {};
+
+  (data || []).forEach((comment) => {
+
+    counts[comment.journey_id] =
+      (counts[comment.journey_id] || 0) + 1;
+
+  });
+
+  document
+    .querySelectorAll("[data-comment-count]")
+    .forEach((counter) => {
+
+      const journeyId =
+        counter.dataset.commentCount;
+
+      counter.textContent =
+        counts[journeyId] || 0;
+
+    });
+}
 function getJourneyVisitorId() {
 
   let visitorId =
@@ -1693,6 +1731,16 @@ async function loadJourneyComments(journeyId) {
     `;
 
     return;
+  }
+
+  const commentCounter =
+    document.querySelector(
+      `[data-comment-count="${journeyId}"]`
+    );
+
+  if (commentCounter) {
+    commentCounter.textContent =
+      (data || []).length;
   }
 
   if (!data || data.length === 0) {
@@ -1879,19 +1927,31 @@ journeyGallery?.addEventListener(
     const canComment =
       await canCommentOnJourney();
 
-    const isHidden =
+    const shouldOpen =
       comments.hidden;
 
-    comments.hidden = !isHidden;
+    comments.hidden =
+      !shouldOpen;
 
-    if (isHidden) {
+    if (shouldOpen) {
 
       await loadJourneyComments(
         journeyId
       );
 
       if (form) {
-        form.hidden = !canComment;
+
+        form.hidden =
+          !canComment;
+
+      }
+
+    } else {
+
+      if (form) {
+
+        form.hidden = true;
+
       }
 
     }
@@ -1995,28 +2055,7 @@ console.log(
 
 input.value = "";
 
-await loadJourneyComments(journeyId);
-
-      if (error) {
-
-        console.error(
-          "Journey comment insert error:",
-          error
-        );
-
-        showAuthToast(
-          "Không thể gửi bình luận.",
-          "error"
-        );
-
-        return;
-      }
-
-      input.value = "";
-
-      await loadJourneyComments(
-        journeyId
-      );
+      await loadJourneyComments(journeyId);
 
     } finally {
 
@@ -2970,6 +3009,8 @@ openJourney?.addEventListener(
     await loadJourneyImages();
 
     await loadJourneyLikeCounts();
+
+    await loadJourneyCommentCounts();
 
     await updateJourneyLikeStates();
 
