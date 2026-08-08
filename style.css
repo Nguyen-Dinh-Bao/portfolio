@@ -1887,3 +1887,79 @@ body[data-role="owner"] .owner-only{
 .journey-gallery:has(.journey-item:only-child)::before {
   display: none;
 }
+/* ==========================================
+   MY JOURNEY — LIKE
+========================================== */
+
+.journey-caption {
+  width: 260px;
+  text-align: center;
+}
+
+.journey-caption p {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: .78rem;
+  line-height: 1.6;
+}
+
+.journey-like-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  border: 0;
+  background: transparent;
+  color: var(--text);
+
+  padding: 5px 8px;
+
+  font: inherit;
+  cursor: pointer;
+
+  transition:
+    transform .2s ease,
+    opacity .2s ease;
+}
+
+.journey-like-button:hover {
+  transform: translateY(-2px);
+  opacity: .7;
+}
+
+.journey-heart {
+  font-size: 1.35rem;
+  line-height: 1;
+
+  transition:
+    transform .2s ease,
+    color .2s ease;
+}
+
+.journey-like-button.liked .journey-heart {
+  color: var(--text);
+}
+
+.journey-like-button.liked .journey-heart {
+  animation: journeyHeartPop .25s ease;
+}
+
+@keyframes journeyHeartPop {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.35);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.journey-like-count {
+  font-size: .72rem;
+  font-weight: 700;
+}

@@ -1399,15 +1399,301 @@ const confirmJourneyUpload =
 
       </div>
 
-      <p class="journey-caption">
-        ${escapeHTML(item.caption || "")}
-      </p>
+      <div class="journey-caption">
+  <p>
+    ${escapeHTML(item.caption || "")}
+  </p>
+
+  <button
+    class="journey-like-button"
+    type="button"
+    data-id="${item.id}"
+    aria-label="Like this image">
+
+    <span class="journey-heart">♡</span>
+
+    <span
+      class="journey-like-count"
+      data-like-count="${item.id}">
+      0
+    </span>
+
+  </button>
+</div>
     `;
 
     journeyGallery.appendChild(article);
 
   });
 }
+async function loadJourneyLikeCounts() {
+
+  const { data, error } =
+    await supabaseClient
+      .from("journey_likes")
+      .select("journey_id");
+
+  if (error) {
+
+    console.error(
+      "Journey like count error:",
+      error
+    );
+
+    return;
+  }
+
+  const counts = {};
+
+  (data || []).forEach((like) => {
+
+    counts[like.journey_id] =
+      (counts[like.journey_id] || 0) + 1;
+
+  });
+
+  document
+    .querySelectorAll("[data-like-count]")
+    .forEach((counter) => {
+
+      const journeyId =
+        counter.dataset.likeCount;
+
+      counter.textContent =
+        counts[journeyId] || 0;
+
+    });
+}
+function getJourneyVisitorId() {
+
+  let visitorId =
+    localStorage.getItem("journey-visitor-id");
+
+  if (!visitorId) {
+
+    visitorId =
+      crypto.randomUUID();
+
+    localStorage.setItem(
+      "journey-visitor-id",
+      visitorId
+    );
+
+  }
+
+  return visitorId;
+}
+async function getJourneyLikeState(journeyId) {
+
+  const session =
+    await getSession();
+
+  if (session?.user) {
+
+    const { data, error } =
+      await supabaseClient
+        .from("journey_likes")
+        .select("id")
+        .eq("journey_id", journeyId)
+        .eq("user_id", session.user.id)
+        .maybeSingle();
+
+    if (error) {
+
+      console.error(
+        "Journey user like state error:",
+        error
+      );
+
+      return null;
+    }
+
+    return !!data;
+  }
+
+  const visitorId =
+    getJourneyVisitorId();
+
+  const { data, error } =
+    await supabaseClient
+      .from("journey_likes")
+      .select("id")
+      .eq("journey_id", journeyId)
+      .eq("visitor_id", visitorId)
+      .maybeSingle();
+
+  if (error) {
+
+    console.error(
+      "Journey visitor like state error:",
+      error
+    );
+
+    return null;
+  }
+
+  return !!data;
+}
+async function updateJourneyLikeStates() {
+
+  const buttons =
+    document.querySelectorAll(
+      ".journey-like-button"
+    );
+
+  for (const button of buttons) {
+
+    const journeyId =
+      button.dataset.id;
+
+    const liked =
+      await getJourneyLikeState(journeyId);
+
+    if (liked === null) continue;
+
+    button.classList.toggle(
+      "liked",
+      liked
+    );
+
+    const heart =
+      button.querySelector(
+        ".journey-heart"
+      );
+
+    if (heart) {
+
+      heart.textContent =
+        liked ? "♥" : "♡";
+
+    }
+
+  }
+}
+journeyGallery?.addEventListener(
+  "click",
+  async (event) => {
+
+    const button =
+      event.target.closest(
+        ".journey-like-button"
+      );
+
+    if (!button) return;
+
+    const journeyId =
+      button.dataset.id;
+
+    if (!journeyId) return;
+
+    button.disabled = true;
+
+    try {
+
+      const session =
+        await getSession();
+
+      let query =
+        supabaseClient
+          .from("journey_likes")
+          .select("id")
+          .eq("journey_id", journeyId);
+
+      if (session?.user) {
+
+        query = query
+          .eq(
+            "user_id",
+            session.user.id
+          );
+
+      } else {
+
+        query = query
+          .eq(
+            "visitor_id",
+            getJourneyVisitorId()
+          );
+
+      }
+
+      const { data: existingLike } =
+        await query.maybeSingle();
+
+
+      if (existingLike) {
+
+        const { error } =
+          await supabaseClient
+            .from("journey_likes")
+            .delete()
+            .eq(
+              "id",
+              existingLike.id
+            );
+
+        if (error) {
+
+          console.error(
+            "Journey unlike error:",
+            error
+          );
+
+          return;
+        }
+
+      } else {
+
+        const payload = {
+          journey_id: journeyId
+        };
+
+        if (session?.user) {
+
+          payload.user_id =
+            session.user.id;
+
+        } else {
+
+          payload.visitor_id =
+            getJourneyVisitorId();
+
+        }
+
+        const { error } =
+          await supabaseClient
+            .from("journey_likes")
+            .insert(payload);
+
+        if (error) {
+
+          console.error(
+            "Journey like error:",
+            error
+          );
+
+          showAuthToast(
+            "Không thể thích ảnh này.",
+            "error"
+          );
+
+          return;
+        }
+
+      }
+
+      await loadJourneyLikeCounts();
+
+      await updateJourneyLikeStates();
+
+    } finally {
+
+      button.disabled = false;
+
+    }
+
+  }
+);
 async function updateJourneyOwnerUI() {
 
   if (!journeyOwnerControls) return;
@@ -1998,6 +2284,10 @@ openJourney?.addEventListener(
   async () => {
 
     await loadJourneyImages();
+
+    await loadJourneyLikeCounts();
+
+    await updateJourneyLikeStates();
 
     await updateJourneyOwnerUI();
 
