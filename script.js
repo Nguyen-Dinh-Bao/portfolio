@@ -867,10 +867,6 @@ function switchPortfolioCMSTab(tab) {
   portfolioAboutTab.classList.remove("active");
   portfolioContactTab.classList.remove("active");
 
-  portfolioHeroPanel.classList.remove("active");
-  portfolioAboutPanel.classList.remove("active");
-  portfolioContactPanel.classList.remove("active");
-
   if (tab === "hero") {
 
     portfolioHeroTab.classList.add("active");
