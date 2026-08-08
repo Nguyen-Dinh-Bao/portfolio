@@ -2072,3 +2072,36 @@ body[data-role="owner"] .owner-only{
 
   width: 100%;
 }
+.journey-comment {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.journey-comment-content {
+  min-width: 0;
+}
+
+.journey-comment-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.journey-comment-actions button {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+
+  padding: 2px 4px;
+
+  font: inherit;
+  font-size: .65rem;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.journey-comment-actions button:hover {
+  color: var(--text);
+}

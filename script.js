@@ -1636,7 +1636,16 @@ async function loadJourneyComments(journeyId) {
   const { data, error } =
     await supabaseClient
       .from("journey_comments")
-      .select("*")
+      .select(`
+        id,
+        journey_id,
+        user_id,
+        content,
+        created_at,
+        profiles (
+          username
+        )
+      `)
       .eq("journey_id", journeyId)
       .order("created_at", {
         ascending: true
@@ -1669,6 +1678,15 @@ async function loadJourneyComments(journeyId) {
     return;
   }
 
+  const session =
+    await getSession();
+
+  const currentUserId =
+    session?.user?.id || null;
+
+  const owner =
+    await isOwner();
+
   data.forEach((comment) => {
 
     const article =
@@ -1677,25 +1695,450 @@ async function loadJourneyComments(journeyId) {
     article.className =
       "journey-comment";
 
-    article.innerHTML = `
-      <span class="journey-comment-author">
-        ${escapeHTML(
-          comment.username ||
-          "User"
-        )}
-      </span>
+    const username =
+      comment.profiles?.username ||
+      "User";
 
-      <span class="journey-comment-text">
-        ${escapeHTML(
-          comment.content || ""
-        )}
-      </span>
+    const canEdit =
+      currentUserId === comment.user_id;
+
+    const canDelete =
+      canEdit || owner;
+
+    article.innerHTML = `
+      <div class="journey-comment-content">
+
+        <span class="journey-comment-author">
+          ${escapeHTML(username)}
+        </span>
+
+        <span class="journey-comment-text">
+          ${escapeHTML(comment.content || "")}
+        </span>
+
+      </div>
+
+      ${
+        canEdit || canDelete
+          ? `
+            <div class="journey-comment-actions">
+
+              ${
+                canEdit
+                  ? `
+                    <button
+                      class="edit-journey-comment"
+                      type="button"
+                      data-id="${comment.id}">
+                      Edit
+                    </button>
+                  `
+                  : ""
+              }
+
+              ${
+                canDelete
+                  ? `
+                    <button
+                      class="delete-journey-comment"
+                      type="button"
+                      data-id="${comment.id}">
+                      Delete
+                    </button>
+                  `
+                  : ""
+              }
+
+            </div>
+          `
+          : ""
+      }
     `;
 
     list.appendChild(article);
 
   });
+
 }
+journeyGallery?.addEventListener(
+  "click",
+  async (event) => {
+
+    const toggle =
+      event.target.closest(
+        ".journey-comment-toggle"
+      );
+
+    if (!toggle) return;
+
+    const journeyId =
+      toggle.dataset.id;
+
+    if (!journeyId) return;
+
+    const comments =
+      document.querySelector(
+        `[data-comments="${journeyId}"]`
+      );
+
+    if (!comments) return;
+
+    const form =
+      document.querySelector(
+        `[data-comment-form="${journeyId}"]`
+      );
+
+    const canComment =
+      await canCommentOnJourney();
+
+    const isHidden =
+      comments.hidden;
+
+    comments.hidden = !isHidden;
+
+    if (isHidden) {
+
+      await loadJourneyComments(
+        journeyId
+      );
+
+      if (form) {
+        form.hidden = !canComment;
+      }
+
+    }
+
+  }
+);
+journeyGallery?.addEventListener(
+  "click",
+  async (event) => {
+
+    const submit =
+      event.target.closest(
+        ".journey-comment-submit"
+      );
+
+    if (!submit) return;
+
+    const journeyId =
+      submit.dataset.id;
+
+    if (!journeyId) return;
+
+    const session =
+      await getSession();
+
+    if (!session?.user) {
+
+      showAuthToast(
+        "Bạn cần đăng nhập để bình luận.",
+        "error"
+      );
+
+      return;
+    }
+
+    const input =
+      document.querySelector(
+        `[data-comment-input="${journeyId}"]`
+      );
+
+    if (!input) return;
+
+    const content =
+      input.value.trim();
+
+    if (!content) {
+
+      showAuthToast(
+        "Bình luận không được để trống.",
+        "error"
+      );
+
+      return;
+    }
+
+    if (content.length > 500) {
+
+      showAuthToast(
+        "Bình luận không được vượt quá 500 ký tự.",
+        "error"
+      );
+
+      return;
+    }
+
+    submit.disabled = true;
+
+    try {
+
+      const { error } =
+        await supabaseClient
+          .from("journey_comments")
+          .insert({
+            journey_id: journeyId,
+            user_id: session.user.id,
+            content: content
+          });
+
+      if (error) {
+
+        console.error(
+          "Journey comment insert error:",
+          error
+        );
+
+        showAuthToast(
+          "Không thể gửi bình luận.",
+          "error"
+        );
+
+        return;
+      }
+
+      input.value = "";
+
+      await loadJourneyComments(
+        journeyId
+      );
+
+    } finally {
+
+      submit.disabled = false;
+
+    }
+
+  }
+);
+journeyGallery?.addEventListener(
+  "click",
+  async (event) => {
+
+    const editButton =
+      event.target.closest(
+        ".edit-journey-comment"
+      );
+
+    if (!editButton) return;
+
+    const commentId =
+      editButton.dataset.id;
+
+    if (!commentId) return;
+
+    const session =
+      await getSession();
+
+    if (!session?.user) {
+
+      showAuthToast(
+        "Bạn cần đăng nhập.",
+        "error"
+      );
+
+      return;
+    }
+
+    const { data: comment, error } =
+      await supabaseClient
+        .from("journey_comments")
+        .select(
+          "id, journey_id, user_id, content"
+        )
+        .eq("id", commentId)
+        .single();
+
+    if (error || !comment) {
+
+      showAuthToast(
+        "Không tìm thấy bình luận.",
+        "error"
+      );
+
+      return;
+    }
+
+    if (
+      comment.user_id !==
+      session.user.id
+    ) {
+
+      showAuthToast(
+        "Bạn chỉ có thể sửa bình luận của mình.",
+        "error"
+      );
+
+      return;
+    }
+
+    const newContent =
+      window.prompt(
+        "Chỉnh sửa bình luận:",
+        comment.content || ""
+      );
+
+    if (newContent === null) return;
+
+    const content =
+      newContent.trim();
+
+    if (!content) {
+
+      showAuthToast(
+        "Bình luận không được để trống.",
+        "error"
+      );
+
+      return;
+    }
+
+    const { error: updateError } =
+      await supabaseClient
+        .from("journey_comments")
+        .update({
+          content: content
+        })
+        .eq("id", commentId)
+        .eq(
+          "user_id",
+          session.user.id
+        );
+
+    if (updateError) {
+
+      console.error(
+        "Journey comment update error:",
+        updateError
+      );
+
+      showAuthToast(
+        "Không thể sửa bình luận.",
+        "error"
+      );
+
+      return;
+    }
+
+    await loadJourneyComments(
+      comment.journey_id
+    );
+
+  }
+);
+journeyGallery?.addEventListener(
+  "click",
+  async (event) => {
+
+    const deleteButton =
+      event.target.closest(
+        ".delete-journey-comment"
+      );
+
+    if (!deleteButton) return;
+
+    const commentId =
+      deleteButton.dataset.id;
+
+    if (!commentId) return;
+
+    const session =
+      await getSession();
+
+    if (!session?.user) {
+
+      showAuthToast(
+        "Bạn cần đăng nhập.",
+        "error"
+      );
+
+      return;
+    }
+
+    const owner =
+      await isOwner();
+
+    const { data: comment, error } =
+      await supabaseClient
+        .from("journey_comments")
+        .select(
+          "id, journey_id, user_id"
+        )
+        .eq("id", commentId)
+        .single();
+
+    if (error || !comment) {
+
+      showAuthToast(
+        "Không tìm thấy bình luận.",
+        "error"
+      );
+
+      return;
+    }
+
+    const canDelete =
+      owner ||
+      comment.user_id === session.user.id;
+
+    if (!canDelete) {
+
+      showAuthToast(
+        "Bạn không có quyền xóa bình luận này.",
+        "error"
+      );
+
+      return;
+    }
+
+    const confirmed =
+      window.confirm(
+        "Bạn có chắc muốn xóa bình luận này?"
+      );
+
+    if (!confirmed) return;
+
+    let deleteQuery =
+      supabaseClient
+        .from("journey_comments")
+        .delete()
+        .eq("id", commentId);
+
+    if (!owner) {
+
+      deleteQuery =
+        deleteQuery.eq(
+          "user_id",
+          session.user.id
+        );
+
+    }
+
+    const { error: deleteError } =
+      await deleteQuery;
+
+    if (deleteError) {
+
+      console.error(
+        "Journey comment delete error:",
+        deleteError
+      );
+
+      showAuthToast(
+        "Không thể xóa bình luận.",
+        "error"
+      );
+
+      return;
+    }
+
+    await loadJourneyComments(
+      comment.journey_id
+    );
+
+  }
+);
+
 journeyGallery?.addEventListener(
   "click",
   async (event) => {
