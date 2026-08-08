@@ -1313,6 +1313,17 @@ const journeyGallery =
 
 const openJourney =
   document.getElementById("openJourney");
+const journeyOwnerControls =
+  document.getElementById("journeyOwnerControls");
+
+const addJourneyImage =
+  document.getElementById("addJourneyImage");
+
+const journeyImageInput =
+  document.getElementById("journeyImageInput");
+
+const journeyOwnerList =
+  document.getElementById("journeyOwnerList");
   async function loadJourneyImages() {
 
   if (!journeyGallery) return;
@@ -1387,11 +1398,118 @@ const openJourney =
 
   });
 }
+async function updateJourneyOwnerUI() {
+
+  if (!journeyOwnerControls) return;
+
+  const owner = await isOwner();
+
+  journeyOwnerControls.hidden = !owner;
+
+  if (owner) {
+    await renderJourneyOwnerList();
+  }
+
+}
+async function renderJourneyOwnerList() {
+
+  if (!journeyOwnerList) return;
+
+  const { data, error } = await supabaseClient
+    .from("journey_images")
+    .select("*")
+    .order("sort_order", {
+      ascending: true
+    })
+    .order("created_at", {
+      ascending: true
+    });
+
+  if (error) {
+
+    console.error(
+      "Journey owner list error:",
+      error
+    );
+
+    journeyOwnerList.innerHTML = `
+      <p class="journey-empty">
+        Không thể tải danh sách Journey.
+      </p>
+    `;
+
+    return;
+  }
+
+  if (!data || data.length === 0) {
+
+    journeyOwnerList.innerHTML = `
+      <p class="journey-empty">
+        Chưa có ảnh nào.
+      </p>
+    `;
+
+    return;
+  }
+
+  journeyOwnerList.innerHTML = "";
+
+  data.forEach((item, index) => {
+
+    const row =
+      document.createElement("div");
+
+    row.className = "journey-owner-item";
+
+    row.innerHTML = `
+      <img
+        class="journey-owner-thumb"
+        src="${escapeHTML(item.image_url)}"
+        alt="Journey ${index + 1}">
+
+      <div class="journey-owner-caption">
+
+        <strong>
+          Journey ${String(index + 1).padStart(2, "0")}
+        </strong>
+
+        <span>
+          ${escapeHTML(item.caption || "No caption")}
+        </span>
+
+      </div>
+
+      <div class="journey-owner-actions">
+
+        <button
+          class="edit-journey"
+          type="button"
+          data-id="${item.id}">
+          Edit
+        </button>
+
+        <button
+          class="delete-journey"
+          type="button"
+          data-id="${item.id}">
+          Delete
+        </button>
+
+      </div>
+    `;
+
+    journeyOwnerList.appendChild(row);
+
+  });
+
+}
 openJourney?.addEventListener(
   "click",
   async () => {
 
     await loadJourneyImages();
+
+    await updateJourneyOwnerUI();
 
     journeyModal?.classList.add("open");
 
