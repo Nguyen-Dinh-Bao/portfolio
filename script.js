@@ -1883,7 +1883,7 @@ journeyGallery?.addEventListener(
     if (!submit) return;
 
     const journeyId =
-      submit.dataset.id;
+      submit.dataset.commentSubmit;
 
     if (!journeyId) return;
 
