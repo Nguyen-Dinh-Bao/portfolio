@@ -1348,3 +1348,63 @@ body[data-role="owner"] .owner-only{
 .change-avatar-button[hidden]{
     display:none !important;
 }
+.portfolio-tabs{
+    display:flex;
+    gap:10px;
+    margin:18px 0 24px;
+}
+
+.portfolio-tab{
+    flex:1;
+    padding:10px 14px;
+    border:1px solid var(--line);
+    background:transparent;
+    border-radius:999px;
+    cursor:pointer;
+    transition:.25s;
+}
+
+.portfolio-tab.active{
+    background:var(--text);
+    color:var(--bg);
+}
+/* ==========================================
+   VERSION 2.5 — PORTFOLIO CMS
+========================================== */
+
+.portfolio-cms-modal {
+  max-height: 85vh;
+  overflow-y: auto;
+}
+.portfolio-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 18px 0 24px;
+}
+
+.portfolio-tab {
+  flex: 1;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 10px 14px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  font-size: .75rem;
+  font-weight: 700;
+  transition: .2s ease;
+}
+
+.portfolio-tab.active {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.portfolio-panel {
+  display: block;
+}
+
+.portfolio-panel[hidden] {
+  display: none;
+}

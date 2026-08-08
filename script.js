@@ -675,14 +675,291 @@ const heroNameInput =
 
 const heroSubtitleInput =
     document.getElementById("heroSubtitleInput");
+    const portfolioHeroTab =
+    document.getElementById("portfolioHeroTab");
+
+const portfolioAboutTab =
+    document.getElementById("portfolioAboutTab");
+
+const portfolioContactTab =
+    document.getElementById("portfolioContactTab");
+    const heroFields =
+    document.getElementById("heroFields");
+
+const infoTitleField =
+    infoTitleInput.closest(".modal-field");
+
+const infoTextField =
+    infoTextInput.closest(".modal-field");
 const addInfoCard = document.getElementById("addInfoCard");
 const editPortfolioButton =
     document.getElementById("editPortfolioButton");
-    editPortfolioButton?.addEventListener("click", async () => {
+    const portfolioCMSModal =
+  document.getElementById("portfolioCMSModal");
 
-    await openInfoEditor("education");
+const closePortfolioCMS =
+  document.getElementById("closePortfolioCMS");
+
+const cancelPortfolioCMS =
+  document.getElementById("cancelPortfolioCMS");
+
+const savePortfolioCMS =
+  document.getElementById("savePortfolioCMS");
+  savePortfolioCMS?.addEventListener("click", async () => {
+
+  const fields = {
+    hero_name: cmsHeroName.value.trim(),
+    hero_subtitle: cmsHeroSubtitle.value.trim(),
+
+    education_title: cmsEducationTitle.value.trim(),
+    education_text: cmsEducationText.value.trim(),
+
+    profile_title: cmsProfileTitle.value.trim(),
+    profile_text: cmsProfileText.value.trim(),
+
+    more_title: cmsMoreTitle.value.trim(),
+    more_text: cmsMoreText.value.trim()
+  };
+
+  if (!fields.hero_name || !fields.hero_subtitle) {
+    showAuthToast(
+      "Hero Name và Hero Subtitle không được để trống.",
+      "error"
+    );
+    return;
+  }
+
+  const ok = await updatePortfolio(fields);
+
+  if (!ok) {
+    showAuthToast(
+      "Không thể lưu Portfolio.",
+      "error"
+    );
+    return;
+  }
+
+  await renderInfoCards();
+
+  closePortfolioCMSModal();
+
+  showAuthToast(
+    "Đã lưu Portfolio thành công.",
+    "success"
+  );
 
 });
+
+const portfolioHeroTab =
+  document.getElementById("portfolioHeroTab");
+
+const portfolioAboutTab =
+  document.getElementById("portfolioAboutTab");
+
+const portfolioContactTab =
+  document.getElementById("portfolioContactTab");
+
+const portfolioHeroPanel =
+  document.getElementById("portfolioHeroPanel");
+
+const portfolioAboutPanel =
+  document.getElementById("portfolioAboutPanel");
+
+const portfolioContactPanel =
+  document.getElementById("portfolioContactPanel");
+const cmsHeroName =
+  document.getElementById("cmsHeroName");
+
+const cmsHeroSubtitle =
+  document.getElementById("cmsHeroSubtitle");
+
+const cmsEducationTitle =
+  document.getElementById("cmsEducationTitle");
+
+const cmsEducationText =
+  document.getElementById("cmsEducationText");
+
+const cmsProfileTitle =
+  document.getElementById("cmsProfileTitle");
+
+const cmsProfileText =
+  document.getElementById("cmsProfileText");
+
+const cmsMoreTitle =
+  document.getElementById("cmsMoreTitle");
+
+const cmsMoreText =
+  document.getElementById("cmsMoreText");
+
+const cmsFacebook =
+  document.getElementById("cmsFacebook");
+
+const cmsInstagram =
+  document.getElementById("cmsInstagram");
+
+const cmsLinkedin =
+  document.getElementById("cmsLinkedin");
+
+const cmsSnapchat =
+  document.getElementById("cmsSnapchat");
+
+const cmsTiktok =
+  document.getElementById("cmsTiktok");
+
+const cmsEmail =
+  document.getElementById("cmsEmail");
+async function openPortfolioCMS() {
+
+  if (!(await isOwner())) {
+    showAuthToast(
+      "Chỉ Owner mới được chỉnh Portfolio.",
+      "error"
+    );
+    return;
+  }
+
+  const loaded = await loadPortfolioCMS();
+
+  if (!loaded) return;
+
+  portfolioCMSModal.classList.add("open");
+  portfolioCMSModal.setAttribute(
+    "aria-hidden",
+    "false"
+  );
+
+}
+
+
+async function loadPortfolioCMS() {
+
+  const portfolio = await loadPortfolio();
+
+  if (!portfolio) {
+    showAuthToast(
+      "Không thể tải dữ liệu Portfolio.",
+      "error"
+    );
+    return false;
+  }
+
+  cmsHeroName.value =
+    portfolio.hero_name || "";
+
+  cmsHeroSubtitle.value =
+    portfolio.hero_subtitle || "";
+
+  cmsEducationTitle.value =
+    portfolio.education_title || "";
+
+  cmsEducationText.value =
+    portfolio.education_text || "";
+
+  cmsProfileTitle.value =
+    portfolio.profile_title || "";
+
+  cmsProfileText.value =
+    portfolio.profile_text || "";
+
+  cmsMoreTitle.value =
+    portfolio.more_title || "";
+
+  cmsMoreText.value =
+    portfolio.more_text || "";
+
+  return true;
+}
+
+
+function switchPortfolioCMSTab(tab) {
+
+  portfolioHeroTab.classList.remove("active");
+  portfolioAboutTab.classList.remove("active");
+  portfolioContactTab.classList.remove("active");
+
+  portfolioHeroPanel.hidden = true;
+  portfolioAboutPanel.hidden = true;
+  portfolioContactPanel.hidden = true;
+
+  if (tab === "hero") {
+
+    portfolioHeroTab.classList.add("active");
+    portfolioHeroPanel.hidden = false;
+
+  }
+
+  if (tab === "about") {
+
+    portfolioAboutTab.classList.add("active");
+    portfolioAboutPanel.hidden = false;
+
+  }
+
+  if (tab === "contact") {
+
+    portfolioContactTab.classList.add("active");
+    portfolioContactPanel.hidden = false;
+
+  }
+
+}
+
+
+portfolioHeroTab?.addEventListener(
+  "click",
+  () => switchPortfolioCMSTab("hero")
+);
+
+portfolioAboutTab?.addEventListener(
+  "click",
+  () => switchPortfolioCMSTab("about")
+);
+
+portfolioContactTab?.addEventListener(
+  "click",
+  () => switchPortfolioCMSTab("contact")
+);
+
+
+function closePortfolioCMSModal() {
+
+  portfolioCMSModal.classList.remove("open");
+
+  portfolioCMSModal.setAttribute(
+    "aria-hidden",
+    "true"
+  );
+
+}
+
+
+closePortfolioCMS?.addEventListener(
+  "click",
+  closePortfolioCMSModal
+);
+
+cancelPortfolioCMS?.addEventListener(
+  "click",
+  closePortfolioCMSModal
+);
+
+
+portfolioCMSModal?.addEventListener(
+  "click",
+  event => {
+
+    if (event.target === portfolioCMSModal) {
+      closePortfolioCMSModal();
+    }
+
+  }
+);
+
+
+editPortfolioButton?.addEventListener(
+  "click",
+  openPortfolioCMS
+);
 let editingCardId = null;
 
 async function renderInfoCards() {
