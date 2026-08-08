@@ -1513,6 +1513,219 @@ async function renderJourneyOwnerList() {
   });
 
 }
+journeyOwnerList?.addEventListener(
+  "click",
+  async (event) => {
+
+    const editButton =
+      event.target.closest(".edit-journey");
+
+    const deleteButton =
+      event.target.closest(".delete-journey");
+
+    if (!editButton && !deleteButton) return;
+
+    if (!(await isOwner())) {
+      showAuthToast(
+        "Chỉ Owner mới được quản lý My Journey.",
+        "error"
+      );
+      return;
+    }
+
+    const journeyId =
+      (editButton || deleteButton)?.dataset.id;
+
+    if (!journeyId) return;
+
+
+    /* ==========================================
+       EDIT CAPTION
+    ========================================== */
+
+    if (editButton) {
+
+      const { data: item, error } =
+        await supabaseClient
+          .from("journey_images")
+          .select("id, caption")
+          .eq("id", journeyId)
+          .single();
+
+      if (error || !item) {
+
+        console.error(
+          "Journey edit load error:",
+          error
+        );
+
+        showAuthToast(
+          "Không thể tải thông tin ảnh.",
+          "error"
+        );
+
+        return;
+      }
+
+      const newCaption =
+        window.prompt(
+          "Chỉnh sửa caption:",
+          item.caption || ""
+        );
+
+      if (newCaption === null) return;
+
+      const caption =
+        newCaption.trim();
+
+      if (caption.length > 300) {
+
+        showAuthToast(
+          "Caption không được vượt quá 300 ký tự.",
+          "error"
+        );
+
+        return;
+      }
+
+      const { error: updateError } =
+        await supabaseClient
+          .from("journey_images")
+          .update({
+            caption: caption
+          })
+          .eq("id", journeyId);
+
+      if (updateError) {
+
+        console.error(
+          "Journey caption update error:",
+          updateError
+        );
+
+        showAuthToast(
+          "Không thể cập nhật caption.",
+          "error"
+        );
+
+        return;
+      }
+
+      showAuthToast(
+        "Đã cập nhật caption.",
+        "success"
+      );
+
+      await loadJourneyImages();
+      await renderJourneyOwnerList();
+
+      return;
+    }
+
+
+    /* ==========================================
+       DELETE IMAGE
+    ========================================== */
+
+    if (deleteButton) {
+
+      const confirmed =
+        window.confirm(
+          "Bạn có chắc muốn xóa ảnh này khỏi My Journey?"
+        );
+
+      if (!confirmed) return;
+
+
+      const { data: item, error } =
+        await supabaseClient
+          .from("journey_images")
+          .select("id, storage_path")
+          .eq("id", journeyId)
+          .single();
+
+      if (error || !item) {
+
+        console.error(
+          "Journey delete load error:",
+          error
+        );
+
+        showAuthToast(
+          "Không thể tìm thấy ảnh.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      /* Xóa file trong Storage trước */
+
+      if (item.storage_path) {
+
+        const { error: storageError } =
+          await supabaseClient
+            .storage
+            .from("Journey")
+            .remove([
+              item.storage_path
+            ]);
+
+        if (storageError) {
+
+          console.error(
+            "Journey storage delete error:",
+            storageError
+          );
+
+          showAuthToast(
+            "Không thể xóa file ảnh trong Storage.",
+            "error"
+          );
+
+          return;
+        }
+
+      }
+
+
+      /* Sau đó xóa record Database */
+
+      const { error: databaseError } =
+        await supabaseClient
+          .from("journey_images")
+          .delete()
+          .eq("id", journeyId);
+
+      if (databaseError) {
+
+        console.error(
+          "Journey database delete error:",
+          databaseError
+        );
+
+        showAuthToast(
+          "File đã được xử lý nhưng không thể xóa dữ liệu ảnh.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      showAuthToast(
+        "Đã xóa ảnh khỏi My Journey.",
+        "success"
+      );
+
+      await loadJourneyImages();
+      await renderJourneyOwnerList();
+
+    }
+
+  }
+);
 addJourneyImage?.addEventListener(
   "click",
   async () => {
