@@ -2654,23 +2654,41 @@ async function renderJourneyOwnerList() {
 
       </div>
 
-      <div class="journey-owner-actions">
+<div class="journey-owner-actions">
 
-        <button
-          class="edit-journey"
-          type="button"
-          data-id="${item.id}">
-          Edit
-        </button>
+  <button
+    class="move-journey-up"
+    type="button"
+    data-id="${item.id}"
+    ${index === 0 ? "disabled" : ""}
+    aria-label="Move Journey up">
+    ↑
+  </button>
 
-        <button
-          class="delete-journey"
-          type="button"
-          data-id="${item.id}">
-          Delete
-        </button>
+  <button
+    class="move-journey-down"
+    type="button"
+    data-id="${item.id}"
+    ${index === data.length - 1 ? "disabled" : ""}
+    aria-label="Move Journey down">
+    ↓
+  </button>
 
-      </div>
+  <button
+    class="edit-journey"
+    type="button"
+    data-id="${item.id}">
+    Edit
+  </button>
+
+  <button
+    class="delete-journey"
+    type="button"
+    data-id="${item.id}">
+    Delete
+  </button>
+
+</div>
     `;
 
     journeyOwnerList.appendChild(row);
