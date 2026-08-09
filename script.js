@@ -776,7 +776,7 @@ async function isOwner() {
 }
 
 async function isUser() {
-    return (await getCurrentRole()) !== "user";
+    return (await getCurrentRole()) === "user";
 }
 
 async function isVisitor() {
