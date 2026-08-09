@@ -26,7 +26,28 @@ html {
 
 body {
   margin: 0;
-  background: var(--bg);
+background:
+  radial-gradient(
+    ellipse at 50% 42%,
+    rgba(245, 247, 252, .95) 0%,
+    rgba(213, 221, 235, .78) 28%,
+    rgba(150, 164, 190, .42) 52%,
+    transparent 72%
+  ),
+  radial-gradient(
+    ellipse at 15% 100%,
+    rgba(230, 235, 246, .8) 0%,
+    rgba(174, 187, 211, .45) 32%,
+    transparent 65%
+  ),
+  linear-gradient(
+    180deg,
+    #172542 0%,
+    #71809d 23%,
+    #dce2ed 47%,
+    #8795ae 72%,
+    #303e59 100%
+  );
   color: var(--text);
   font-family: "DM Sans", system-ui, sans-serif;
   line-height: 1.6;
@@ -44,6 +65,34 @@ body.dark {
   --dark: #f1e5d8;
 
   --nav-bg: rgba(16, 11, 7, .82);
+
+  background:
+    radial-gradient(
+      ellipse at 8% 36%,
+      rgba(124, 61, 16, .55) 0%,
+      rgba(74, 35, 12, .32) 22%,
+      transparent 48%
+    ),
+    radial-gradient(
+      ellipse at 54% 72%,
+      rgba(139, 66, 18, .62) 0%,
+      rgba(76, 35, 12, .32) 25%,
+      transparent 52%
+    ),
+    radial-gradient(
+      ellipse at 20% 92%,
+      rgba(113, 51, 14, .5) 0%,
+      transparent 45%
+    ),
+    linear-gradient(
+      180deg,
+      #080604 0%,
+      #100a06 38%,
+      #0b0704 70%,
+      #050403 100%
+    );
+
+  background-attachment: fixed;
 }
 body.dark .dark-button {
   color: #101010;
