@@ -982,12 +982,63 @@ async function loadOwnerFeedback() {
 
   const { data, error } = await supabaseClient
     .from("feedback")
-    .select("id,user_id,message,created_at")
+    .select(`
+  id,
+  user_id,
+  message,
+  created_at
+`)
     .order("created_at", { ascending: false });
 
   if (error) {
     console.error(error);
-    return [];
+    const feedbacks = data || [];
+
+if (!feedbacks.length) {
+  return [];
+}
+
+const userIds = [
+  ...new Set(
+    feedbacks
+      .map(item => item.user_id)
+      .filter(Boolean)
+  )
+];
+
+if (!userIds.length) {
+  return feedbacks;
+}
+
+const {
+  data: profiles,
+  error: profileError
+} = await supabaseClient
+  .from("profiles")
+  .select("id, username, email")
+  .in("id", userIds);
+
+if (profileError) {
+  console.error(
+    "Feedback profile error:",
+    profileError
+  );
+
+  return feedbacks;
+}
+
+const profileMap = new Map(
+  (profiles || []).map(profile => [
+    profile.id,
+    profile
+  ])
+);
+
+return feedbacks.map(item => ({
+  ...item,
+  profile:
+    profileMap.get(item.user_id) || null
+}));
   }
 
   return data || [];
@@ -1039,12 +1090,45 @@ async function renderOwnerFeedback() {
     return;
   }
 
-  ownerFeedbackList.innerHTML = feedbacks.map(item => `
-    <article class="feedback-box">
-      <p>${escapeHTML(item.message)}</p>
-      <small>${new Date(item.created_at).toLocaleString("vi-VN")}</small>
-    </article>
-  `).join("");
+  ownerFeedbackList.innerHTML =
+  feedbacks.map(item => {
+
+    const profile =
+      item.profile || {};
+
+    const username =
+      profile.username || "Unknown user";
+
+    const email =
+      profile.email || "No email";
+
+    return `
+      <article class="feedback-box">
+
+        <div class="feedback-user">
+          <strong>
+            ${escapeHTML(username)}
+          </strong>
+
+          <small>
+            ${escapeHTML(email)}
+          </small>
+        </div>
+
+        <p>
+          ${escapeHTML(item.message)}
+        </p>
+
+        <small>
+          ${new Date(
+            item.created_at
+          ).toLocaleString("vi-VN")}
+        </small>
+
+      </article>
+    `;
+
+  }).join("");
 }
 saveAccount?.addEventListener("click", async () => {
   const session=await getSession();

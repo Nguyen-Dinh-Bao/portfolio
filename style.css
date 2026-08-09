@@ -2509,3 +2509,19 @@ body.dark {
     var(--dark-p4, 84% -5%),
     center;
 }
+.feedback-user {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  margin-bottom: 14px;
+}
+
+.feedback-user strong {
+  font-size: .8rem;
+}
+
+.feedback-user small {
+  color: var(--muted);
+  font-size: .65rem;
+}
