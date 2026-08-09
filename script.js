@@ -439,7 +439,10 @@ const dashboardJourneyCount =
   document.getElementById(
     "dashboardJourneyCount"
   );
-
+  const dashboardLikeCount =
+  document.getElementById(
+    "dashboardLikeCount"
+  );
 const dashboardCommentCount =
   document.getElementById(
     "dashboardCommentCount"
@@ -461,12 +464,13 @@ const dashboardRecommendCount =
   }
 
 
-  const [
-    journeyResult,
-    commentResult,
-    feedbackResult,
-    recommendResult
-  ] = await Promise.all([
+const [
+  journeyResult,
+  likeResult,
+  commentResult,
+  feedbackResult,
+  recommendResult
+] = await Promise.all([
 
     supabaseClient
       .from("journey_images")
@@ -474,7 +478,12 @@ const dashboardRecommendCount =
         count: "exact",
         head: true
       }),
-
+supabaseClient
+  .from("journey_likes")
+  .select("id", {
+    count: "exact",
+    head: true
+  }),
     supabaseClient
       .from("journey_comments")
       .select("id", {
@@ -532,7 +541,10 @@ const dashboardRecommendCount =
     dashboardJourneyCount.textContent =
       journeyResult.count ?? 0;
   }
-
+if (dashboardLikeCount) {
+  dashboardLikeCount.textContent =
+    likeResult.count ?? 0;
+}
 
   if (dashboardCommentCount) {
     dashboardCommentCount.textContent =

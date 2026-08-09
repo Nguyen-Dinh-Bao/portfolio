@@ -656,7 +656,7 @@ textarea::placeholder { color: var(--muted); }
 
 .dashboard-stats {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 12px;
 
   margin: 48px 0 70px;
