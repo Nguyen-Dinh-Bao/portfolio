@@ -2706,7 +2706,20 @@ journeyOwnerList?.addEventListener(
     const deleteButton =
       event.target.closest(".delete-journey");
 
-    if (!editButton && !deleteButton) return;
+    const moveUpButton =
+      event.target.closest(".move-journey-up");
+
+    const moveDownButton =
+      event.target.closest(".move-journey-down");
+
+    if (
+      !editButton &&
+      !deleteButton &&
+      !moveUpButton &&
+      !moveDownButton
+    ) {
+      return;
+    }
 
     if (!(await isOwner())) {
       showAuthToast(
@@ -2716,10 +2729,198 @@ journeyOwnerList?.addEventListener(
       return;
     }
 
-    const journeyId =
-      (editButton || deleteButton)?.dataset.id;
+const journeyId =
+  (
+    editButton ||
+    deleteButton ||
+    moveUpButton ||
+    moveDownButton
+  )?.dataset.id;
 
     if (!journeyId) return;
+
+    /* ==========================================
+   MOVE JOURNEY IMAGE
+========================================== */
+
+if (moveUpButton || moveDownButton) {
+
+  const { data: images, error: imagesError } =
+    await supabaseClient
+      .from("journey_images")
+      .select("id, sort_order")
+      .order("sort_order", {
+        ascending: true
+      })
+      .order("created_at", {
+        ascending: true
+      });
+
+  if (imagesError || !images) {
+
+    console.error(
+      "Journey reorder load error:",
+      imagesError
+    );
+
+    showAuthToast(
+      "Không thể sắp xếp Journey.",
+      "error"
+    );
+
+    return;
+  }
+
+  const currentIndex =
+    images.findIndex(
+      (image) =>
+        String(image.id) ===
+        String(journeyId)
+    );
+
+  if (currentIndex === -1) {
+    return;
+  }
+
+  const targetIndex =
+    moveUpButton
+      ? currentIndex - 1
+      : currentIndex + 1;
+
+  /* Không cho vượt quá đầu/cuối */
+  if (
+    targetIndex < 0 ||
+    targetIndex >= images.length
+  ) {
+    return;
+  }
+
+  const currentImage =
+    images[currentIndex];
+
+  const targetImage =
+    images[targetIndex];
+
+  const currentOrder =
+    currentImage.sort_order;
+
+  const targetOrder =
+    targetImage.sort_order;
+
+  /*
+    Tạo giá trị tạm để tránh
+    hai record cùng sort_order
+  */
+  const temporaryOrder =
+    Math.min(
+      ...images.map(
+        (image) =>
+          Number(image.sort_order) || 0
+      )
+    ) - 1;
+
+  /* ==========================
+     STEP 1
+     Current → temporary
+  ========================== */
+
+  const { error: tempError } =
+    await supabaseClient
+      .from("journey_images")
+      .update({
+        sort_order: temporaryOrder
+      })
+      .eq("id", currentImage.id);
+
+  if (tempError) {
+
+    console.error(
+      "Journey temporary reorder error:",
+      tempError
+    );
+
+    showAuthToast(
+      "Không thể thay đổi vị trí.",
+      "error"
+    );
+
+    return;
+  }
+
+  /* ==========================
+     STEP 2
+     Target → Current order
+  ========================== */
+
+  const { error: targetError } =
+    await supabaseClient
+      .from("journey_images")
+      .update({
+        sort_order: currentOrder
+      })
+      .eq("id", targetImage.id);
+
+  if (targetError) {
+
+    console.error(
+      "Journey target reorder error:",
+      targetError
+    );
+
+    /* Khôi phục current */
+    await supabaseClient
+      .from("journey_images")
+      .update({
+        sort_order: currentOrder
+      })
+      .eq("id", currentImage.id);
+
+    showAuthToast(
+      "Không thể thay đổi vị trí.",
+      "error"
+    );
+
+    return;
+  }
+
+  /* ==========================
+     STEP 3
+     Current → Target order
+  ========================== */
+
+  const { error: currentError } =
+    await supabaseClient
+      .from("journey_images")
+      .update({
+        sort_order: targetOrder
+      })
+      .eq("id", currentImage.id);
+
+  if (currentError) {
+
+    console.error(
+      "Journey current reorder error:",
+      currentError
+    );
+
+    showAuthToast(
+      "Không thể hoàn tất việc sắp xếp.",
+      "error"
+    );
+
+    return;
+  }
+
+  showAuthToast(
+    "Đã thay đổi vị trí Journey.",
+    "success"
+  );
+
+  await loadJourneyImages();
+  await renderJourneyOwnerList();
+
+  return;
+}
 
 
     /* ==========================================
