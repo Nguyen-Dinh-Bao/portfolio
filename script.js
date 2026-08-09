@@ -976,72 +976,76 @@ async function refreshAccountUI() {
  renderSignedInAccount(profile);
 }
 async function loadOwnerFeedback() {
+
   if (currentUserRole !== "owner") {
     return [];
   }
 
-  const { data, error } = await supabaseClient
+  const {
+    data,
+    error
+  } = await supabaseClient
     .from("feedback")
-    .select(`
-  id,
-  user_id,
-  message,
-  created_at
-`)
-    .order("created_at", { ascending: false });
+    .select(
+      "id, user_id, message, created_at"
+    )
+    .order(
+      "created_at",
+      { ascending: false }
+    );
 
   if (error) {
     console.error(error);
-    const feedbacks = data || [];
-
-if (!feedbacks.length) {
-  return [];
-}
-
-const userIds = [
-  ...new Set(
-    feedbacks
-      .map(item => item.user_id)
-      .filter(Boolean)
-  )
-];
-
-if (!userIds.length) {
-  return feedbacks;
-}
-
-const {
-  data: profiles,
-  error: profileError
-} = await supabaseClient
-  .from("profiles")
-  .select("id, username, email")
-  .in("id", userIds);
-
-if (profileError) {
-  console.error(
-    "Feedback profile error:",
-    profileError
-  );
-
-  return feedbacks;
-}
-
-const profileMap = new Map(
-  (profiles || []).map(profile => [
-    profile.id,
-    profile
-  ])
-);
-
-return feedbacks.map(item => ({
-  ...item,
-  profile:
-    profileMap.get(item.user_id) || null
-}));
+    return [];
   }
 
-  return data || [];
+  const feedbacks = data || [];
+
+  if (!feedbacks.length) {
+    return [];
+  }
+
+  const userIds = [
+    ...new Set(
+      feedbacks
+        .map(item => item.user_id)
+        .filter(Boolean)
+    )
+  ];
+
+  if (!userIds.length) {
+    return feedbacks;
+  }
+
+  const {
+    data: profiles,
+    error: profileError
+  } = await supabaseClient
+    .from("profiles")
+    .select("id, username, email")
+    .in("id", userIds);
+
+  if (profileError) {
+    console.error(
+      "Feedback profile error:",
+      profileError
+    );
+
+    return feedbacks;
+  }
+
+  const profileMap = new Map(
+    (profiles || []).map(profile => [
+      profile.id,
+      profile
+    ])
+  );
+
+  return feedbacks.map(item => ({
+    ...item,
+    profile:
+      profileMap.get(item.user_id) || null
+  }));
 }
 async function loadOwnerRecommendations() {
   if (currentUserRole !== "owner") {
