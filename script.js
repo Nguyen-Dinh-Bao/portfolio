@@ -3210,3 +3210,33 @@ document.addEventListener(
 
   }
 );
+/* =========================
+   AMBIENT MOUSE LIGHT
+========================= */
+
+document.addEventListener(
+  "pointermove",
+  (event) => {
+
+    const x =
+      (event.clientX /
+        window.innerWidth) *
+      100;
+
+    const y =
+      (event.clientY /
+        window.innerHeight) *
+      100;
+
+    document.body.style.setProperty(
+      "--mouse-x",
+      `${x}%`
+    );
+
+    document.body.style.setProperty(
+      "--mouse-y",
+      `${y}%`
+    );
+
+  }
+);
