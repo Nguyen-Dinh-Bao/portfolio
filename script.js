@@ -415,6 +415,12 @@ document.querySelectorAll(".settings-tab").forEach(button => {
 
     button.classList.add("active");
     const panel = document.getElementById(button.dataset.panel);
+    if (
+  button.dataset.panel === "dashboard" &&
+  currentUserRole === "owner"
+) {
+  loadDashboardStats();
+}
     panel.classList.add("active-panel");
 
     panel.querySelectorAll(".reveal").forEach(item => {
@@ -429,6 +435,123 @@ const feedbackCounter = document.getElementById("feedbackCounter");
 const dashboardTab = document.getElementById("dashboardTab");
 const ownerFeedbackList = document.getElementById("ownerFeedbackList");
 const ownerRecommendList = document.getElementById("ownerRecommendList");
+const dashboardJourneyCount =
+  document.getElementById(
+    "dashboardJourneyCount"
+  );
+
+const dashboardCommentCount =
+  document.getElementById(
+    "dashboardCommentCount"
+  );
+
+const dashboardFeedbackCount =
+  document.getElementById(
+    "dashboardFeedbackCount"
+  );
+
+const dashboardRecommendCount =
+  document.getElementById(
+    "dashboardRecommendCount"
+  );
+  async function loadDashboardStats() {
+
+  if (currentUserRole !== "owner") {
+    return;
+  }
+
+
+  const [
+    journeyResult,
+    commentResult,
+    feedbackResult,
+    recommendResult
+  ] = await Promise.all([
+
+    supabaseClient
+      .from("journey_images")
+      .select("id", {
+        count: "exact",
+        head: true
+      }),
+
+    supabaseClient
+      .from("journey_comments")
+      .select("id", {
+        count: "exact",
+        head: true
+      }),
+
+    supabaseClient
+      .from("feedback")
+      .select("id", {
+        count: "exact",
+        head: true
+      }),
+
+    supabaseClient
+      .from("recommendations")
+      .select("id", {
+        count: "exact",
+        head: true
+      })
+
+  ]);
+
+
+  if (journeyResult.error) {
+    console.error(
+      "Dashboard Journey count error:",
+      journeyResult.error
+    );
+  }
+
+  if (commentResult.error) {
+    console.error(
+      "Dashboard Comment count error:",
+      commentResult.error
+    );
+  }
+
+  if (feedbackResult.error) {
+    console.error(
+      "Dashboard Feedback count error:",
+      feedbackResult.error
+    );
+  }
+
+  if (recommendResult.error) {
+    console.error(
+      "Dashboard Recommend count error:",
+      recommendResult.error
+    );
+  }
+
+
+  if (dashboardJourneyCount) {
+    dashboardJourneyCount.textContent =
+      journeyResult.count ?? 0;
+  }
+
+
+  if (dashboardCommentCount) {
+    dashboardCommentCount.textContent =
+      commentResult.count ?? 0;
+  }
+
+
+  if (dashboardFeedbackCount) {
+    dashboardFeedbackCount.textContent =
+      feedbackResult.count ?? 0;
+  }
+
+
+  if (dashboardRecommendCount) {
+    dashboardRecommendCount.textContent =
+      recommendResult.count ?? 0;
+  }
+
+}
 function updateFeedback() {
   const length = feedbackInput.value.trim().length;
   feedbackCounter.textContent = `${length} / 5 ký tự tối thiểu`;
@@ -745,9 +868,10 @@ function applyRoleUI(role) {
   if (dashboardTab) {
   dashboardTab.hidden = !isOwner;
   }
-  if (isOwner) {
+if (isOwner) {
   renderOwnerFeedback();
   renderOwnerRecommendations();
+  loadDashboardStats();
 }
   if (feedbackSend) {
     feedbackSend.disabled = !isUser && !isOwner;

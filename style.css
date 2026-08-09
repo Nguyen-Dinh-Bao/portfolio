@@ -650,6 +650,69 @@ textarea::placeholder { color: var(--muted); }
 }
 
 .settings-panel.active-panel { display: block; }
+/* ==========================================
+   OWNER DASHBOARD — OVERVIEW
+========================================== */
+
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+
+  margin: 48px 0 70px;
+}
+
+
+.dashboard-stat {
+  min-height: 150px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  padding: 22px;
+
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+
+  background: var(--surface);
+
+  transition:
+    transform .25s ease,
+    border-color .25s ease;
+}
+
+
+.dashboard-stat:hover {
+  transform: translateY(-5px);
+  border-color: var(--muted);
+}
+
+
+.dashboard-stat-label {
+  color: var(--muted);
+
+  font-size: .62rem;
+  font-weight: 800;
+  letter-spacing: .14em;
+}
+
+
+.dashboard-stat-number {
+  margin: 20px 0 0;
+
+  font-size: clamp(2.4rem, 4vw, 4rem);
+  line-height: .9;
+  letter-spacing: -.07em;
+  font-weight: 700;
+}
+
+
+.dashboard-stat-note {
+  color: var(--muted);
+
+  font-size: .68rem;
+}
 
 .setting-line {
   display: flex;
@@ -2016,6 +2079,19 @@ body[data-role="owner"] .owner-only{
     grid-column: 1 / -1;
   }
 
+  .dashboard-stats {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+
+  margin-top: 35px;
+  margin-bottom: 55px;
+}
+
+
+.dashboard-stat {
+  min-height: 125px;
+  padding: 18px;
+}
 }
 .journey-upload-form {
   margin-top: 20px;
