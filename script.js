@@ -2401,12 +2401,12 @@ if (!confirmed) return;
       return;
     }
 
-    const confirmed =
-      window.confirm(
-        "Bạn có chắc muốn xóa bình luận này?"
-      );
+const commentConfirmed =
+  window.confirm(
+    "Bạn có chắc muốn xóa bình luận này?"
+  );
 
-    if (!confirmed) return;
+if (!commentConfirmed) return;
 
     let deleteQuery =
       supabaseClient
