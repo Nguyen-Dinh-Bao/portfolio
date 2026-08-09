@@ -2525,3 +2525,94 @@ body.dark {
   color: var(--muted);
   font-size: .65rem;
 }
+/* ==========================================
+   JOURNEY — VISUAL POLISH / PHASE 1
+========================================== */
+
+.journey-item {
+  transition:
+    transform .35s ease;
+}
+
+.journey-image-wrap {
+  border-radius: 22px;
+
+  border: 1px solid
+    color-mix(
+      in srgb,
+      var(--line) 75%,
+      transparent
+    );
+
+  box-shadow:
+    0 12px 30px
+    rgba(0, 0, 0, .06);
+
+  transition:
+    transform .35s ease,
+    box-shadow .35s ease,
+    border-color .35s ease;
+}
+
+.journey-image {
+  transition:
+    transform .6s cubic-bezier(.2, .7, .2, 1);
+}
+
+.journey-item:hover {
+  transform: translateY(-5px);
+}
+
+.journey-item:hover
+.journey-image-wrap {
+  box-shadow:
+    0 20px 45px
+    rgba(0, 0, 0, .11);
+
+  border-color:
+    color-mix(
+      in srgb,
+      var(--text) 18%,
+      var(--line)
+    );
+}
+
+.journey-item:hover
+.journey-image {
+  transform: scale(1.045);
+}
+
+.journey-caption {
+  transition:
+    transform .35s ease,
+    opacity .35s ease;
+}
+
+.journey-item:hover
+.journey-caption {
+  transform: translateY(-2px);
+}
+@media (max-width: 650px) {
+
+  .journey-item:hover {
+    transform: none;
+  }
+
+  .journey-item:hover
+  .journey-image-wrap {
+    box-shadow:
+      0 14px 32px
+      rgba(0, 0, 0, .08);
+  }
+
+  .journey-item:hover
+  .journey-image {
+    transform: none;
+  }
+
+  .journey-item:hover
+  .journey-caption {
+    transform: none;
+  }
+
+}
