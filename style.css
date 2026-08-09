@@ -28,38 +28,41 @@ body {
   margin: 0;
 background:
   radial-gradient(
-    ellipse 58% 50% at 50% 42%,
-    rgba(248, 250, 253, .95) 0%,
-    rgba(222, 229, 240, .72) 35%,
+    ellipse 75% 65% at 50% 42%,
+    rgba(250, 252, 255, .98) 0%,
+    rgba(226, 232, 242, .86) 30%,
+    rgba(177, 189, 210, .48) 58%,
+    transparent 78%
+  ),
+
+  radial-gradient(
+    ellipse 60% 80% at -5% 105%,
+    rgba(53, 72, 106, .58) 0%,
+    rgba(91, 110, 143, .35) 30%,
+    rgba(133, 149, 176, .12) 55%,
+    transparent 76%
+  ),
+
+  radial-gradient(
+    ellipse 55% 65% at 105% -5%,
+    rgba(38, 57, 91, .52) 0%,
+    rgba(78, 98, 132, .25) 35%,
     transparent 72%
   ),
 
   radial-gradient(
-    ellipse 48% 58% at 4% 100%,
-    rgba(76, 94, 126, .52) 0%,
-    rgba(111, 128, 158, .25) 34%,
-    transparent 72%
-  ),
-
-  radial-gradient(
-    ellipse 45% 50% at 100% 8%,
-    rgba(53, 72, 106, .42) 0%,
-    rgba(90, 108, 140, .18) 32%,
-    transparent 70%
-  ),
-
-  radial-gradient(
-    ellipse 65% 30% at 50% 110%,
-    rgba(118, 136, 166, .42) 0%,
-    transparent 72%
+    ellipse 80% 45% at 50% 110%,
+    rgba(93, 112, 145, .42) 0%,
+    rgba(133, 149, 176, .18) 42%,
+    transparent 76%
   ),
 
   linear-gradient(
-    160deg,
-    #172541 0%,
-    #52627e 24%,
-    #cbd4e3 48%,
-    #8c9bb3 73%,
+    145deg,
+    #182844 0%,
+    #52627e 22%,
+    #b9c4d6 46%,
+    #8d9bb2 70%,
     #34435e 100%
   );
 
@@ -83,44 +86,42 @@ body.dark {
   --nav-bg: rgba(16, 11, 7, .82);
 
 background:
-  /* Glow cam bên trái — rộng, rất mềm */
   radial-gradient(
-    ellipse 48% 55% at 4% 42%,
-    rgba(139, 66, 18, .34) 0%,
-    rgba(104, 46, 14, .20) 30%,
+    ellipse 62% 55% at 7% 38%,
+    rgba(135, 63, 17, .42) 0%,
+    rgba(104, 45, 12, .26) 25%,
+    rgba(70, 31, 10, .10) 48%,
+    transparent 76%
+  ),
+
+  radial-gradient(
+    ellipse 55% 48% at 62% 76%,
+    rgba(156, 70, 17, .48) 0%,
+    rgba(112, 45, 10, .28) 25%,
+    rgba(71, 28, 8, .10) 50%,
+    transparent 78%
+  ),
+
+  radial-gradient(
+    ellipse 65% 38% at 22% 108%,
+    rgba(116, 48, 12, .34) 0%,
+    rgba(78, 30, 8, .14) 42%,
+    transparent 75%
+  ),
+
+  radial-gradient(
+    ellipse 75% 45% at 82% -5%,
+    rgba(72, 37, 17, .22) 0%,
     transparent 72%
   ),
 
-  /* Glow chính — nằm thấp và lệch phải */
-  radial-gradient(
-    ellipse 42% 38% at 62% 78%,
-    rgba(157, 72, 18, .42) 0%,
-    rgba(105, 45, 12, .20) 32%,
-    transparent 72%
-  ),
-
-  /* Ánh cam rất nhẹ ở đáy trái */
-  radial-gradient(
-    ellipse 55% 30% at 24% 105%,
-    rgba(119, 52, 14, .24) 0%,
-    transparent 70%
-  ),
-
-  /* Vùng nâu cực nhẹ phía trên */
-  radial-gradient(
-    ellipse 70% 40% at 72% 0%,
-    rgba(64, 34, 18, .20) 0%,
-    transparent 72%
-  ),
-
-  /* Nền đen chính */
   linear-gradient(
     145deg,
-    #050403 0%,
-    #0a0604 28%,
-    #110904 55%,
-    #080504 78%,
-    #030302 100%
+    #040302 0%,
+    #0a0503 27%,
+    #120904 53%,
+    #090504 78%,
+    #030202 100%
   );
 
 background-attachment: fixed;
@@ -2308,4 +2309,89 @@ body[data-role="owner"] .owner-only{
 
 .journey-comment-edit-actions button:hover {
   color: var(--text);
+}
+body {
+  background-size:
+    130% 130%,
+    125% 125%,
+    120% 120%,
+    125% 125%,
+    100% 100%;
+
+  transition:
+    background-position 1.2s ease,
+    color .3s ease;
+}
+
+body:hover {
+  background-position:
+    2% 1%,
+    -2% 3%,
+    2% -2%,
+    -1% 2%,
+    center;
+}
+@keyframes lightAmbientMove {
+  0% {
+    background-position:
+      0% 0%,
+      0% 0%,
+      0% 0%,
+      0% 0%,
+      center;
+  }
+
+  50% {
+    background-position:
+      2% 1%,
+      -2% 2%,
+      1% -2%,
+      -1% 2%,
+      center;
+  }
+
+  100% {
+    background-position:
+      0% 0%,
+      0% 0%,
+      0% 0%,
+      0% 0%,
+      center;
+  }
+}
+
+body {
+  animation: lightAmbientMove 14s ease-in-out infinite;
+}
+@keyframes darkAmbientMove {
+  0% {
+    background-position:
+      0% 0%,
+      0% 0%,
+      0% 0%,
+      0% 0%,
+      center;
+  }
+
+  50% {
+    background-position:
+      -2% 2%,
+      2% -1%,
+      -1% 2%,
+      1% -2%,
+      center;
+  }
+
+  100% {
+    background-position:
+      0% 0%,
+      0% 0%,
+      0% 0%,
+      0% 0%,
+      center;
+  }
+}
+
+body.dark {
+  animation: darkAmbientMove 16s ease-in-out infinite;
 }
