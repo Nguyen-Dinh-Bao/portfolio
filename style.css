@@ -2168,3 +2168,59 @@ body[data-role="owner"] .owner-only{
 .journey-comment-actions button:hover {
   color: var(--text);
 }
+.journey-comment-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  width: 100%;
+  margin-top: 8px;
+}
+
+.journey-comment-edit textarea {
+  width: 100%;
+  min-height: 70px;
+
+  padding: 8px 10px;
+
+  border: 1px solid var(--line);
+  border-radius: 10px;
+
+  background: transparent;
+  color: var(--text);
+
+  font: inherit;
+  font-size: .75rem;
+
+  resize: vertical;
+  outline: none;
+
+  box-sizing: border-box;
+}
+
+.journey-comment-edit textarea:focus {
+  border-color: var(--text);
+}
+
+.journey-comment-edit-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.journey-comment-edit-actions button {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+
+  padding: 3px 6px;
+
+  font: inherit;
+  font-size: .65rem;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.journey-comment-edit-actions button:hover {
+  color: var(--text);
+}

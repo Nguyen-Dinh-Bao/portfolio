@@ -2141,16 +2141,113 @@ journeyGallery?.addEventListener(
       return;
     }
 
-    const newContent =
-      window.prompt(
-        "Chỉnh sửa bình luận:",
+const article =
+  editButton.closest(".journey-comment");
+
+if (!article) return;
+
+article.innerHTML = `
+  <div class="journey-comment-edit">
+
+    <textarea
+      class="journey-comment-edit-input"
+      maxlength="500"
+      rows="3">${escapeHTML(
         comment.content || ""
+      )}</textarea>
+
+    <div class="journey-comment-edit-actions">
+
+      <button
+        type="button"
+        class="cancel-journey-comment-edit"
+        data-id="${comment.id}">
+        Cancel
+      </button>
+
+      <button
+        type="button"
+        class="save-journey-comment-edit"
+        data-id="${comment.id}">
+        Save
+      </button>
+
+    </div>
+
+  </div>
+`;
+journeyGallery?.addEventListener(
+  "click",
+  async (event) => {
+
+    const saveButton =
+      event.target.closest(
+        ".save-journey-comment-edit"
       );
 
-    if (newContent === null) return;
+    const cancelButton =
+      event.target.closest(
+        ".cancel-journey-comment-edit"
+      );
+
+    if (!saveButton && !cancelButton) {
+      return;
+    }
+
+    const button =
+      saveButton || cancelButton;
+
+    const commentId =
+      button.dataset.id;
+
+    if (!commentId) return;
+
+    const article =
+      button.closest(".journey-comment");
+
+    if (!article) return;
+
+    /* ==========================
+       CANCEL
+    ========================== */
+
+    if (cancelButton) {
+
+      const {
+        data: comment,
+        error
+      } = await supabaseClient
+        .from("journey_comments")
+        .select(
+          "id, journey_id, user_id, content"
+        )
+        .eq("id", commentId)
+        .single();
+
+      if (error || !comment) {
+        return;
+      }
+
+      await loadJourneyComments(
+        comment.journey_id
+      );
+
+      return;
+    }
+
+    /* ==========================
+       SAVE
+    ========================== */
+
+    const input =
+      article.querySelector(
+        ".journey-comment-edit-input"
+      );
+
+    if (!input) return;
 
     const content =
-      newContent.trim();
+      input.value.trim();
 
     if (!content) {
 
@@ -2162,35 +2259,59 @@ journeyGallery?.addEventListener(
       return;
     }
 
-    const { error: updateError } =
-      await supabaseClient
-        .from("journey_comments")
-        .update({
-          content: content
-        })
-        .eq("id", commentId)
-        .eq(
-          "user_id",
-          session.user.id
-        );
-
-    if (updateError) {
-
-      console.error(
-        "Journey comment update error:",
-        updateError
-      );
+    if (content.length > 500) {
 
       showAuthToast(
-        "Không thể sửa bình luận.",
+        "Bình luận không được vượt quá 500 ký tự.",
         "error"
       );
 
       return;
     }
 
+    const session =
+      await getSession();
+
+    if (!session?.user) {
+
+      showAuthToast(
+        "Bạn cần đăng nhập.",
+        "error"
+      );
+
+      return;
+    }
+
+    const {
+      error: updateError
+    } = await supabaseClient
+      .from("journey_comments")
+      .update({
+        content: content
+      })
+      .eq("id", commentId)
+      .eq(
+        "user_id",
+        session.user.id
+      );
+
+    const {
+      data: updatedComment,
+      error: fetchError
+    } = await supabaseClient
+      .from("journey_comments")
+      .select(
+        "journey_id"
+      )
+      .eq("id", commentId)
+      .single();
+
+    if (fetchError || !updatedComment) {
+      return;
+    }
+
     await loadJourneyComments(
-      comment.journey_id
+      updatedComment.journey_id
     );
 
   }
