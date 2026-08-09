@@ -1,205 +1,147 @@
 const body = document.body;
 const progress = document.getElementById("pageProgress");
 const navbar = document.getElementById("navbar");
-function updateAmbientBackground(progress) {
-
-  const root = document.documentElement;
-
-  /*
-   * ==========================
-   * LIGHT
-   * ==========================
-   */
-
-  const light = {
-
-    l1x:
-      50 +
-      Math.sin(progress * Math.PI * 2) * 11,
-
-    l1y:
-      38 +
-      progress * 20,
-
-    l1w:
-      82 +
-      Math.sin(progress * Math.PI) * 13,
-
-    l1h:
-      68 -
-      progress * 10,
-
-
-    l2x:
-      -8 +
-      progress * 24,
-
-    l2y:
-      108 -
-      progress * 30,
-
-    l2w:
-      65 +
-      Math.sin(progress * Math.PI) * 10,
-
-    l2h:
-      82 -
-      progress * 14,
-
-
-    l3x:
-      108 -
-      progress * 27,
-
-    l3y:
-      -8 +
-      progress * 28,
-
-    l3w:
-      58 +
-      progress * 12,
-
-    l3h:
-      70 +
-      Math.sin(progress * Math.PI) * 9,
-
-
-    l4x:
-      52 +
-      Math.sin(progress * Math.PI * 2) * 15,
-
-    l4y:
-      112 -
-      progress * 34,
-
-    l4w:
-      85 -
-      progress * 9,
-
-    l4h:
-      48 +
-      progress * 12
-
-  };
-
-
-  /*
-   * ==========================
-   * DARK
-   * ==========================
-   */
-
-  const dark = {
-
-    d1x:
-      6 +
-      Math.sin(progress * Math.PI * 2) * 15,
-
-    d1y:
-      38 +
-      progress * 22,
-
-    d1w:
-      65 +
-      progress * 12,
-
-    d1h:
-      58 -
-      progress * 9,
-
-
-    d2x:
-      65 -
-      progress * 23,
-
-    d2y:
-      76 -
-      progress * 20,
-
-    d2w:
-      58 +
-      Math.sin(progress * Math.PI) * 11,
-
-    d2h:
-      50 +
-      progress * 10,
-
-
-    d3x:
-      20 +
-      progress * 28,
-
-    d3y:
-      108 -
-      progress * 38,
-
-    d3w:
-      70 -
-      progress * 10,
-
-    d3h:
-      42 +
-      progress * 11,
-
-
-    d4x:
-      84 -
-      progress * 30,
-
-    d4y:
-      -5 +
-      progress * 25,
-
-    d4w:
-      78 +
-      progress * 10,
-
-    d4h:
-      48 -
-      progress * 9
-
-  };
-
-
-  Object.entries(light).forEach(
-    ([key, value]) => {
-
-      root.style.setProperty(
-        `--${key}`,
-        `${value}%`
-      );
-
-    }
-  );
-
-
-  Object.entries(dark).forEach(
-    ([key, value]) => {
-
-      root.style.setProperty(
-        `--${key}`,
-        `${value}%`
-      );
-
-    }
-  );
-
-}
-
 function updatePageUI() {
-  const scrollTop = window.scrollY;
-  const height = document.documentElement.scrollHeight - window.innerHeight;
-  const percent = height > 0 ? (scrollTop / height) * 100 : 0;
-  progress.style.width = `${percent}%`;
 
-  navbar.classList.toggle("scrolled", scrollTop > 10);
-    updateAmbientBackground(
+  const scrollTop = window.scrollY;
+
+  const height =
+    document.documentElement.scrollHeight -
+    window.innerHeight;
+
+  const progressValue =
     height > 0
-      ? scrollTop / height
-      : 0
+      ? Math.min(scrollTop / height, 1)
+      : 0;
+
+  progress.style.width =
+    `${progressValue * 100}%`;
+
+  navbar.classList.toggle(
+    "scrolled",
+    scrollTop > 10
+  );
+
+
+  /* ==================================
+     LIGHT BACKGROUND
+  ================================== */
+
+  const lightP1X =
+    50 +
+    Math.sin(progressValue * Math.PI * 1.5) * 25;
+
+  const lightP1Y =
+    38 +
+    progressValue * 38;
+
+  const lightP2X =
+    -8 +
+    progressValue * 55;
+
+  const lightP2Y =
+    108 -
+    progressValue * 65;
+
+  const lightP3X =
+    108 -
+    progressValue * 60;
+
+  const lightP3Y =
+    -8 +
+    progressValue * 55;
+
+  const lightP4X =
+    52 +
+    Math.sin(progressValue * Math.PI * 2) * 30;
+
+  const lightP4Y =
+    112 -
+    progressValue * 55;
+
+
+  /* ==================================
+     DARK BACKGROUND
+  ================================== */
+
+  const darkP1X =
+    6 +
+    Math.sin(progressValue * Math.PI * 1.5) * 30;
+
+  const darkP1Y =
+    38 +
+    progressValue * 42;
+
+  const darkP2X =
+    65 -
+    progressValue * 55;
+
+  const darkP2Y =
+    76 -
+    progressValue * 38;
+
+  const darkP3X =
+    20 +
+    progressValue * 55;
+
+  const darkP3Y =
+    108 -
+    progressValue * 70;
+
+  const darkP4X =
+    84 -
+    progressValue * 60;
+
+  const darkP4Y =
+    -5 +
+    progressValue * 48;
+
+
+  /* ==================================
+     APPLY
+  ================================== */
+
+  document.documentElement.style.setProperty(
+    "--light-p1",
+    `${lightP1X}% ${lightP1Y}%`
+  );
+
+  document.documentElement.style.setProperty(
+    "--light-p2",
+    `${lightP2X}% ${lightP2Y}%`
+  );
+
+  document.documentElement.style.setProperty(
+    "--light-p3",
+    `${lightP3X}% ${lightP3Y}%`
+  );
+
+  document.documentElement.style.setProperty(
+    "--light-p4",
+    `${lightP4X}% ${lightP4Y}%`
+  );
+
+
+  document.documentElement.style.setProperty(
+    "--dark-p1",
+    `${darkP1X}% ${darkP1Y}%`
+  );
+
+  document.documentElement.style.setProperty(
+    "--dark-p2",
+    `${darkP2X}% ${darkP2Y}%`
+  );
+
+  document.documentElement.style.setProperty(
+    "--dark-p3",
+    `${darkP3X}% ${darkP3Y}%`
+  );
+
+  document.documentElement.style.setProperty(
+    "--dark-p4",
+    `${darkP4X}% ${darkP4Y}%`
   );
 }
-
 window.addEventListener("scroll", updatePageUI, { passive: true });
 updatePageUI();
 

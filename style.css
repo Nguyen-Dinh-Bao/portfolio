@@ -17,47 +17,6 @@
 
   --radius: 24px;
   --nav-height: 74px;
-    /* Dynamic Light Background */
-  --l1-x: 50%;
-  --l1-y: 38%;
-  --l1-w: 82%;
-  --l1-h: 68%;
-
-  --l2-x: -8%;
-  --l2-y: 108%;
-  --l2-w: 65%;
-  --l2-h: 82%;
-
-  --l3-x: 108%;
-  --l3-y: -8%;
-  --l3-w: 58%;
-  --l3-h: 70%;
-
-  --l4-x: 52%;
-  --l4-y: 112%;
-  --l4-w: 85%;
-  --l4-h: 48%;
-
-  /* Dynamic Dark Background */
-  --d1-x: 6%;
-  --d1-y: 38%;
-  --d1-w: 65%;
-  --d1-h: 58%;
-
-  --d2-x: 65%;
-  --d2-y: 76%;
-  --d2-w: 58%;
-  --d2-h: 50%;
-
-  --d3-x: 20%;
-  --d3-y: 108%;
-  --d3-w: 70%;
-  --d3-h: 42%;
-
-  --d4-x: 84%;
-  --d4-y: -5%;
-  --d4-w: 78%;
-  --d4-h: 48%;
 }
 
 html {
@@ -2398,4 +2357,39 @@ body.dark::before {
     );
 
   opacity: .9;
+}
+/* ==========================================
+   DYNAMIC AMBIENT BACKGROUND
+========================================== */
+
+body {
+  background-size:
+    145% 145%,
+    135% 135%,
+    125% 125%,
+    145% 145%,
+    100% 100%;
+
+  background-position:
+    var(--light-p1, 50% 38%),
+    var(--light-p2, -8% 108%),
+    var(--light-p3, 108% -8%),
+    var(--light-p4, 52% 112%),
+    center;
+}
+
+body.dark {
+  background-size:
+    135% 135%,
+    130% 130%,
+    145% 145%,
+    140% 140%,
+    100% 100%;
+
+  background-position:
+    var(--dark-p1, 6% 38%),
+    var(--dark-p2, 65% 76%),
+    var(--dark-p3, 20% 108%),
+    var(--dark-p4, 84% -5%),
+    center;
 }
