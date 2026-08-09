@@ -2176,6 +2176,7 @@ article.innerHTML = `
 `;
   }
 );
+
 journeyGallery?.addEventListener(
   "click",
   async (event) => {
@@ -2294,7 +2295,20 @@ journeyGallery?.addEventListener(
         "user_id",
         session.user.id
       );
+if (updateError) {
 
+  console.error(
+    "Journey comment update error:",
+    updateError
+  );
+
+  showAuthToast(
+    "Không thể sửa bình luận.",
+    "error"
+  );
+
+  return;
+}
     const {
       data: updatedComment,
       error: fetchError
