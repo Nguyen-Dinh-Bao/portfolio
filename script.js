@@ -2340,6 +2340,12 @@ journeyGallery?.addEventListener(
       );
 
     if (!deleteButton) return;
+    const confirmed =
+  window.confirm(
+    "Bạn có chắc muốn xóa bình luận này?"
+  );
+
+if (!confirmed) return;
 
     const commentId =
       deleteButton.dataset.id;
