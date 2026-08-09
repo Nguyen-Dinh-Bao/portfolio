@@ -1048,21 +1048,76 @@ async function loadOwnerFeedback() {
   }));
 }
 async function loadOwnerRecommendations() {
+
   if (currentUserRole !== "owner") {
     return [];
   }
 
-  const { data, error } = await supabaseClient
+  const {
+    data,
+    error
+  } = await supabaseClient
     .from("recommendations")
-    .select("id,user_id,book,media,story,explanation,created_at")
-    .order("created_at", { ascending: false });
+    .select(
+      "id, user_id, book, media, story, explanation, created_at"
+    )
+    .order(
+      "created_at",
+      { ascending: false }
+    );
 
   if (error) {
     console.error(error);
     return [];
   }
 
-  return data || [];
+  const recommendations = data || [];
+
+  if (!recommendations.length) {
+    return [];
+  }
+
+  const userIds = [
+    ...new Set(
+      recommendations
+        .map(item => item.user_id)
+        .filter(Boolean)
+    )
+  ];
+
+  if (!userIds.length) {
+    return recommendations;
+  }
+
+  const {
+    data: profiles,
+    error: profileError
+  } = await supabaseClient
+    .from("profiles")
+    .select("id, username, email")
+    .in("id", userIds);
+
+  if (profileError) {
+    console.error(
+      "Recommend profile error:",
+      profileError
+    );
+
+    return recommendations;
+  }
+
+  const profileMap = new Map(
+    (profiles || []).map(profile => [
+      profile.id,
+      profile
+    ])
+  );
+
+  return recommendations.map(item => ({
+    ...item,
+    profile:
+      profileMap.get(item.user_id) || null
+  }));
 }
 async function renderOwnerRecommendations() {
   if (!ownerRecommendList) return;
@@ -1074,15 +1129,61 @@ async function renderOwnerRecommendations() {
     return;
   }
 
-  ownerRecommendList.innerHTML = recommendations.map(item => `
-    <article class="feedback-box">
-      <p><strong>Book:</strong> ${escapeHTML(item.book || "—")}</p>
-      <p><strong>Media:</strong> ${escapeHTML(item.media || "—")}</p>
-      <p><strong>Story:</strong> ${escapeHTML(item.story || "—")}</p>
-      <p><strong>Explanation:</strong> ${escapeHTML(item.explanation || "—")}</p>
-      <small>${new Date(item.created_at).toLocaleString("vi-VN")}</small>
-    </article>
-  `).join("");
+  ownerRecommendList.innerHTML =
+  recommendations.map(item => {
+
+    const profile =
+      item.profile || {};
+
+    const username =
+      profile.username || "Unknown user";
+
+    const email =
+      profile.email || "No email";
+
+    return `
+      <article class="feedback-box">
+
+        <div class="feedback-user">
+          <strong>
+            ${escapeHTML(username)}
+          </strong>
+
+          <small>
+            ${escapeHTML(email)}
+          </small>
+        </div>
+
+        <p>
+          <strong>Book:</strong>
+          ${escapeHTML(item.book || "—")}
+        </p>
+
+        <p>
+          <strong>Media:</strong>
+          ${escapeHTML(item.media || "—")}
+        </p>
+
+        <p>
+          <strong>Story:</strong>
+          ${escapeHTML(item.story || "—")}
+        </p>
+
+        <p>
+          <strong>Explanation:</strong>
+          ${escapeHTML(item.explanation || "—")}
+        </p>
+
+        <small>
+          ${new Date(
+            item.created_at
+          ).toLocaleString("vi-VN")}
+        </small>
+
+      </article>
+    `;
+
+  }).join("");
 }
 async function renderOwnerFeedback() {
   if (!ownerFeedbackList) return;
