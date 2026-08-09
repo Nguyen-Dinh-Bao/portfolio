@@ -1045,6 +1045,23 @@ const savePortfolioCMS =
   document.getElementById("savePortfolioCMS");
   savePortfolioCMS?.addEventListener("click", async () => {
 
+    const contactUrls = [
+  cmsFacebook.value.trim(),
+  cmsInstagram.value.trim(),
+  cmsLinkedin.value.trim(),
+  cmsSnapchat.value.trim(),
+  cmsTiktok.value.trim()
+];
+
+for (const url of contactUrls) {
+  if (url && !/^https?:\/\/.+/i.test(url)) {
+    showAuthToast(
+      "Contact link phải bắt đầu bằng http:// hoặc https://.",
+      "error"
+    );
+    return;
+  }
+}
 const fields = {
   hero_name: cmsHeroName.value.trim(),
   hero_subtitle: cmsHeroSubtitle.value.trim(),
