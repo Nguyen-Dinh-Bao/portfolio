@@ -24,122 +24,329 @@ function updatePageUI() {
 
 
   /* ==================================
-     LIGHT BACKGROUND
+     LIGHT — POSITION
   ================================== */
 
-  const lightP1X =
+  const l1x =
     50 +
-    Math.sin(progressValue * Math.PI * 1.5) * 25;
+    Math.sin(progressValue * Math.PI * 1.4) * 22;
 
-  const lightP1Y =
-    38 +
-    progressValue * 38;
+  const l1y =
+    34 +
+    progressValue * 42;
 
-  const lightP2X =
-    -8 +
-    progressValue * 55;
+  const l2x =
+    -10 +
+    progressValue * 52;
 
-  const lightP2Y =
-    108 -
-    progressValue * 65;
+  const l2y =
+    110 -
+    progressValue * 68;
 
-  const lightP3X =
-    108 -
-    progressValue * 60;
+  const l3x =
+    110 -
+    progressValue * 58;
 
-  const lightP3Y =
-    -8 +
-    progressValue * 55;
+  const l3y =
+    -10 +
+    progressValue * 62;
 
-  const lightP4X =
-    52 +
-    Math.sin(progressValue * Math.PI * 2) * 30;
+  const l4x =
+    48 +
+    Math.sin(progressValue * Math.PI * 2) * 28;
 
-  const lightP4Y =
+  const l4y =
     112 -
-    progressValue * 55;
+    progressValue * 58;
 
 
   /* ==================================
-     DARK BACKGROUND
+     LIGHT — SHAPE
   ================================== */
 
-  const darkP1X =
+  const l1w =
+    82 +
+    Math.sin(progressValue * Math.PI) * 18;
+
+  const l1h =
+    68 -
+    progressValue * 18;
+
+  const l2w =
+    65 +
+    progressValue * 18;
+
+  const l2h =
+    82 -
+    progressValue * 20;
+
+  const l3w =
+    58 +
+    progressValue * 20;
+
+  const l3h =
+    70 +
+    Math.sin(progressValue * Math.PI) * 15;
+
+  const l4w =
+    85 -
+    progressValue * 20;
+
+  const l4h =
+    48 +
+    progressValue * 18;
+
+
+  /* ==================================
+     DARK — POSITION
+  ================================== */
+
+  const d1x =
     6 +
     Math.sin(progressValue * Math.PI * 1.5) * 30;
 
-  const darkP1Y =
+  const d1y =
     38 +
     progressValue * 42;
 
-  const darkP2X =
+  const d2x =
     65 -
-    progressValue * 55;
+    progressValue * 58;
 
-  const darkP2Y =
+  const d2y =
     76 -
     progressValue * 38;
 
-  const darkP3X =
+  const d3x =
     20 +
-    progressValue * 55;
+    progressValue * 58;
 
-  const darkP3Y =
+  const d3y =
     108 -
     progressValue * 70;
 
-  const darkP4X =
+  const d4x =
     84 -
-    progressValue * 60;
+    progressValue * 62;
 
-  const darkP4Y =
+  const d4y =
     -5 +
-    progressValue * 48;
+    progressValue * 50;
 
 
   /* ==================================
-     APPLY
+     DARK — SHAPE
   ================================== */
 
-  document.documentElement.style.setProperty(
-    "--light-p1",
-    `${lightP1X}% ${lightP1Y}%`
+  const d1w =
+    65 +
+    Math.sin(progressValue * Math.PI) * 18;
+
+  const d1h =
+    58 -
+    progressValue * 12;
+
+  const d2w =
+    58 +
+    progressValue * 20;
+
+  const d2h =
+    50 +
+    Math.sin(progressValue * Math.PI) * 15;
+
+  const d3w =
+    70 -
+    progressValue * 18;
+
+  const d3h =
+    42 +
+    progressValue * 20;
+
+  const d4w =
+    78 +
+    Math.sin(progressValue * Math.PI) * 16;
+
+  const d4h =
+    48 -
+    progressValue * 12;
+
+
+  /* ==================================
+     APPLY LIGHT
+  ================================== */
+
+  const root =
+    document.documentElement;
+
+  root.style.setProperty(
+    "--l1-x",
+    `${l1x}%`
   );
 
-  document.documentElement.style.setProperty(
-    "--light-p2",
-    `${lightP2X}% ${lightP2Y}%`
+  root.style.setProperty(
+    "--l1-y",
+    `${l1y}%`
   );
 
-  document.documentElement.style.setProperty(
-    "--light-p3",
-    `${lightP3X}% ${lightP3Y}%`
+  root.style.setProperty(
+    "--l1-w",
+    `${l1w}%`
   );
 
-  document.documentElement.style.setProperty(
-    "--light-p4",
-    `${lightP4X}% ${lightP4Y}%`
+  root.style.setProperty(
+    "--l1-h",
+    `${l1h}%`
   );
 
 
-  document.documentElement.style.setProperty(
-    "--dark-p1",
-    `${darkP1X}% ${darkP1Y}%`
+  root.style.setProperty(
+    "--l2-x",
+    `${l2x}%`
   );
 
-  document.documentElement.style.setProperty(
-    "--dark-p2",
-    `${darkP2X}% ${darkP2Y}%`
+  root.style.setProperty(
+    "--l2-y",
+    `${l2y}%`
   );
 
-  document.documentElement.style.setProperty(
-    "--dark-p3",
-    `${darkP3X}% ${darkP3Y}%`
+  root.style.setProperty(
+    "--l2-w",
+    `${l2w}%`
   );
 
-  document.documentElement.style.setProperty(
-    "--dark-p4",
-    `${darkP4X}% ${darkP4Y}%`
+  root.style.setProperty(
+    "--l2-h",
+    `${l2h}%`
+  );
+
+
+  root.style.setProperty(
+    "--l3-x",
+    `${l3x}%`
+  );
+
+  root.style.setProperty(
+    "--l3-y",
+    `${l3y}%`
+  );
+
+  root.style.setProperty(
+    "--l3-w",
+    `${l3w}%`
+  );
+
+  root.style.setProperty(
+    "--l3-h",
+    `${l3h}%`
+  );
+
+
+  root.style.setProperty(
+    "--l4-x",
+    `${l4x}%`
+  );
+
+  root.style.setProperty(
+    "--l4-y",
+    `${l4y}%`
+  );
+
+  root.style.setProperty(
+    "--l4-w",
+    `${l4w}%`
+  );
+
+  root.style.setProperty(
+    "--l4-h",
+    `${l4h}%`
+  );
+
+
+  /* ==================================
+     APPLY DARK
+  ================================== */
+
+  root.style.setProperty(
+    "--d1-x",
+    `${d1x}%`
+  );
+
+  root.style.setProperty(
+    "--d1-y",
+    `${d1y}%`
+  );
+
+  root.style.setProperty(
+    "--d1-w",
+    `${d1w}%`
+  );
+
+  root.style.setProperty(
+    "--d1-h",
+    `${d1h}%`
+  );
+
+
+  root.style.setProperty(
+    "--d2-x",
+    `${d2x}%`
+  );
+
+  root.style.setProperty(
+    "--d2-y",
+    `${d2y}%`
+  );
+
+  root.style.setProperty(
+    "--d2-w",
+    `${d2w}%`
+  );
+
+  root.style.setProperty(
+    "--d2-h",
+    `${d2h}%`
+  );
+
+
+  root.style.setProperty(
+    "--d3-x",
+    `${d3x}%`
+  );
+
+  root.style.setProperty(
+    "--d3-y",
+    `${d3y}%`
+  );
+
+  root.style.setProperty(
+    "--d3-w",
+    `${d3w}%`
+  );
+
+  root.style.setProperty(
+    "--d3-h",
+    `${d3h}%`
+  );
+
+
+  root.style.setProperty(
+    "--d4-x",
+    `${d4x}%`
+  );
+
+  root.style.setProperty(
+    "--d4-y",
+    `${d4y}%`
+  );
+
+  root.style.setProperty(
+    "--d4-w",
+    `${d4w}%`
+  );
+
+  root.style.setProperty(
+    "--d4-h",
+    `${d4h}%`
   );
 }
 window.addEventListener("scroll", updatePageUI, { passive: true });
