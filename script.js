@@ -2140,12 +2140,10 @@ journeyGallery?.addEventListener(
 
       return;
     }
-  });
 const article =
   editButton.closest(".journey-comment");
 
 if (!article) return;
-
 article.innerHTML = `
   <div class="journey-comment-edit">
 
@@ -2176,6 +2174,8 @@ article.innerHTML = `
 
   </div>
 `;
+  }
+);
 journeyGallery?.addEventListener(
   "click",
   async (event) => {
