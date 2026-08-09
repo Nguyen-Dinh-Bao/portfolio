@@ -1235,14 +1235,43 @@ async function renderOwnerFeedback() {
 
   }).join("");
 }
+function validateAccountInput(username, email, password) {
+
+  if (!username) {
+    return "Username không được để trống.";
+  }
+
+  if (!/^[A-Za-z0-9_.-]{3,30}$/.test(username)) {
+    return "Username chỉ được gồm chữ, số, dấu _, dấu . hoặc dấu - và dài 3–30 ký tự.";
+  }
+
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return "Gmail chưa đúng định dạng.";
+  }
+
+  if (password && password.length < 6) {
+    return "Password phải có ít nhất 6 ký tự.";
+  }
+
+  return null;
+}
 saveAccount?.addEventListener("click", async () => {
   const session=await getSession();
   if (!session) return showAuthToast("Hãy đăng nhập trước khi chỉnh sửa Account.","error");
   const username=accountUsername.value.trim(), email=accountEmail.value.trim(), bio=accountBio.value.trim(), pw=accountPassword.value;
-  if (!/^[A-Za-z0-9_.-]{3,30}$/.test(username)) return showAuthToast("Username không hợp lệ.","error");
-  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-  return showAuthToast("Gmail chưa đúng định dạng.","error");
-  if (pw && pw.length<6) return showAuthToast("Password phải có ít nhất 6 ký tự.","error");
+  const validationError =
+  validateAccountInput(
+    username,
+    email,
+    pw
+  );
+
+if (validationError) {
+  return showAuthToast(
+    validationError,
+    "error"
+  );
+}
   const {data: dup,error:dupErr}=await supabaseClient.from("profiles").select("id").eq("username",username).neq("id",session.user.id).maybeSingle();
   if (dupErr) return showAuthToast("Không thể kiểm tra Username.","error");
   if (dup) return showAuthToast("Username đã được sử dụng","error");
@@ -1256,30 +1285,100 @@ saveAccount?.addEventListener("click", async () => {
   .select("id,username,email,bio,avatar_url,role")
   .single();
   if (error) { console.error(error); return showAuthToast("Không thể lưu thông tin Account.","error"); }
-  if (email && email !== session.user.email) {
-  const { error: emailError } = await supabaseClient.auth.updateUser({
+let emailChangeRequested = false;
+
+if (
+  email &&
+  email.toLowerCase() !==
+    (session.user.email || "").toLowerCase()
+) {
+
+  const {
+    error: emailError
+  } = await supabaseClient.auth.updateUser({
     email: email
   });
 
   if (emailError) {
-    console.error(emailError);
+
+    console.error(
+      "Email update error:",
+      emailError
+    );
+
     return showAuthToast(
-      "Username và Bio đã lưu nhưng Gmail chưa cập nhật.",
+      `Không thể đổi Email: ${
+        emailError.message ||
+        "Lỗi không xác định."
+      }`,
       "error"
     );
   }
+
+  emailChangeRequested = true;
 }
-  if (pw) {
-    
-    const {error:pe}=await supabaseClient.auth.updateUser({password:pw});
-    if (pe) return showAuthToast("Thông tin đã lưu nhưng Password chưa cập nhật.","error");
+let passwordChanged = false;
+
+if (pw) {
+
+  const {
+    error: passwordError
+  } = await supabaseClient.auth.updateUser({
+    password: pw
+  });
+
+  if (passwordError) {
+
+    console.error(
+      "Password update error:",
+      passwordError
+    );
+
+    return showAuthToast(
+      `Không thể đổi Password: ${
+        passwordError.message ||
+        "Lỗi không xác định."
+      }`,
+      "error"
+    );
   }
+
+  passwordChanged = true;
+}
   renderSignedInAccount({
   ...updated,
   email: email
 }); await refreshAccountUI();
 await updatePermissionUI();
-  showAuthToast("Đã đồng bộ Account online.","success");
+if (emailChangeRequested && passwordChanged) {
+
+  showAuthToast(
+    "Account đã cập nhật. Email mới cần được xác nhận qua Gmail.",
+    "success"
+  );
+
+} else if (emailChangeRequested) {
+
+  showAuthToast(
+    "Username đã cập nhật. Email mới cần được xác nhận qua Gmail.",
+    "success"
+  );
+
+} else if (passwordChanged) {
+
+  showAuthToast(
+    "Username và Password đã được cập nhật.",
+    "success"
+  );
+
+} else {
+
+  showAuthToast(
+    "Đã cập nhật Account.",
+    "success"
+  );
+
+}
 });
 resetAccount?.addEventListener("click",async()=>{renderSignedInAccount(await getCurrentProfile());});
 passwordToggle?.addEventListener("click",()=>{const h=accountPassword.type==="password";accountPassword.type=h?"text":"password";passwordToggle.textContent=h?"○":"◉";});
