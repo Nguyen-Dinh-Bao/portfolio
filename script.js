@@ -2140,7 +2140,7 @@ journeyGallery?.addEventListener(
 
       return;
     }
-
+  });
 const article =
   editButton.closest(".journey-comment");
 
