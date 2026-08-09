@@ -1045,19 +1045,26 @@ const savePortfolioCMS =
   document.getElementById("savePortfolioCMS");
   savePortfolioCMS?.addEventListener("click", async () => {
 
-  const fields = {
-    hero_name: cmsHeroName.value.trim(),
-    hero_subtitle: cmsHeroSubtitle.value.trim(),
+const fields = {
+  hero_name: cmsHeroName.value.trim(),
+  hero_subtitle: cmsHeroSubtitle.value.trim(),
 
-    education_title: cmsEducationTitle.value.trim(),
-    education_text: cmsEducationText.value.trim(),
+  education_title: cmsEducationTitle.value.trim(),
+  education_text: cmsEducationText.value.trim(),
 
-    profile_title: cmsProfileTitle.value.trim(),
-    profile_text: cmsProfileText.value.trim(),
+  profile_title: cmsProfileTitle.value.trim(),
+  profile_text: cmsProfileText.value.trim(),
 
-    more_title: cmsMoreTitle.value.trim(),
-    more_text: cmsMoreText.value.trim()
-  };
+  more_title: cmsMoreTitle.value.trim(),
+  more_text: cmsMoreText.value.trim(),
+
+  facebook: cmsFacebook.value.trim(),
+  instagram: cmsInstagram.value.trim(),
+  linkedin: cmsLinkedin.value.trim(),
+  snapchat: cmsSnapchat.value.trim(),
+  tiktok: cmsTiktok.value.trim(),
+  email: cmsEmail.value.trim()
+};
 
   if (!fields.hero_name || !fields.hero_subtitle) {
     showAuthToast(
@@ -1194,6 +1201,24 @@ async function loadPortfolioCMS() {
 
   cmsMoreText.value =
     portfolio.more_text || "";
+    
+  cmsFacebook.value =
+  portfolio.facebook || "";
+
+cmsInstagram.value =
+  portfolio.instagram || "";
+
+cmsLinkedin.value =
+  portfolio.linkedin || "";
+
+cmsSnapchat.value =
+  portfolio.snapchat || "";
+
+cmsTiktok.value =
+  portfolio.tiktok || "";
+
+cmsEmail.value =
+  portfolio.email || "";
 
   return true;
 }
