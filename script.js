@@ -1094,7 +1094,7 @@ async function loadOwnerRecommendations() {
     error: profileError
   } = await supabaseClient
     .from("profiles")
-    .select("id, username, email")
+    .select("id, username, email, avatar_url")
     .in("id", userIds);
 
   if (profileError) {
@@ -1144,15 +1144,32 @@ async function renderOwnerRecommendations() {
     return `
       <article class="feedback-box">
 
-        <div class="feedback-user">
-          <strong>
-            ${escapeHTML(username)}
-          </strong>
+<div class="feedback-user">
 
-          <small>
-            ${escapeHTML(email)}
-          </small>
-        </div>
+  <img
+    class="dashboard-recommend-avatar"
+    src="${escapeHTML(
+      profile.avatar_url ||
+      "assets/profile.jpg"
+    )}"
+    alt="${escapeHTML(username)} avatar"
+    loading="lazy"
+    onerror="this.onerror=null;this.src='assets/profile.jpg';"
+  >
+
+  <div class="recommend-user-info">
+
+    <strong>
+      ${escapeHTML(username)}
+    </strong>
+
+    <small>
+      ${escapeHTML(email)}
+    </small>
+
+  </div>
+
+</div>
 
         <p>
           <strong>Book:</strong>
