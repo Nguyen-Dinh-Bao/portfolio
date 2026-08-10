@@ -2702,7 +2702,7 @@ async function loadJourneyComments(journeyId) {
       error: profilesError
     } = await supabaseClient
       .from("profiles")
-      .select("id, username")
+      .select("id, username, avatar_url")
       .in("id", userIds);
 
     if (profilesError) {
@@ -2714,12 +2714,17 @@ async function loadJourneyComments(journeyId) {
 
     } else {
 
-      (profiles || []).forEach(profile => {
+(profiles || []).forEach(profile => {
 
-        profilesMap[profile.id] =
-          profile.username || "User";
+  profilesMap[profile.id] = {
+    username:
+      profile.username || "User",
 
-      });
+    avatar_url:
+      profile.avatar_url || ""
+  };
+
+});
 
     }
 
@@ -3436,14 +3441,31 @@ journeyGallery?.addEventListener(
 
       if (existingLike) {
 
-        const { error } =
-          await supabaseClient
-            .from("journey_likes")
-            .delete()
-            .eq(
-              "id",
-              existingLike.id
-            );
+        let deleteQuery =
+  supabaseClient
+    .from("journey_likes")
+    .delete()
+    .eq("id", existingLike.id);
+
+if (session?.user) {
+
+  deleteQuery =
+    deleteQuery.eq(
+      "user_id",
+      session.user.id
+    );
+
+} else {
+
+  deleteQuery =
+    deleteQuery.eq(
+      "visitor_id",
+      getJourneyVisitorId()
+    );
+}
+
+const { error } =
+  await deleteQuery;
 
         if (error) {
 
