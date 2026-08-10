@@ -1898,6 +1898,21 @@ body[data-role="owner"] .owner-only{
 
   color: var(--muted);
 }
+.journey-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 260px;
+}
+
+.journey-loading span {
+  display: block;
+}
+
+.journey-loading p {
+  margin-top: 6px;
+}
 
 .journey-empty span {
   display: block;
@@ -2818,4 +2833,39 @@ body.dark {
   display: flex;
   flex-direction: column;
   gap: 3px;
+}
+/* ==========================================
+   PHASE 9 — DASHBOARD EMPTY / ERROR STATES
+========================================== */
+
+.dashboard-empty-state {
+  min-height: 150px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding: 30px;
+
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+
+  text-align: center;
+}
+
+.dashboard-empty-state strong {
+  font-size: .9rem;
+  font-weight: 700;
+}
+
+.dashboard-empty-state span {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: .75rem;
+}
+
+.dashboard-error-state {
+  border-style: dashed;
 }

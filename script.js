@@ -1018,10 +1018,10 @@ async function loadOwnerFeedback() {
       { ascending: false }
     );
 
-  if (error) {
-    console.error(error);
-    return [];
-  }
+if (error) {
+  console.error("Owner Feedback load error:", error);
+  return null;
+}
 
   const feedbacks = data || [];
 
@@ -1090,10 +1090,10 @@ async function loadOwnerRecommendations() {
       { ascending: false }
     );
 
-  if (error) {
-    console.error(error);
-    return [];
-  }
+if (error) {
+  console.error("Owner Recommend load error:", error);
+  return null;
+}
 
   const recommendations = data || [];
 
@@ -1146,13 +1146,27 @@ async function loadOwnerRecommendations() {
 async function renderOwnerRecommendations() {
   if (!ownerRecommendList) return;
 
-  const recommendations = await loadOwnerRecommendations();
+const recommendations = await loadOwnerRecommendations();
 
-  if (!recommendations.length) {
-    ownerRecommendList.innerHTML = "<p>Chưa có Recommend nào.</p>";
-    return;
-  }
+if (recommendations === null) {
+  ownerRecommendList.innerHTML = `
+    <div class="dashboard-empty-state dashboard-error-state">
+      <strong>Không thể tải Recommend.</strong>
+      <span>Vui lòng thử lại sau.</span>
+    </div>
+  `;
+  return;
+}
 
+if (recommendations.length === 0) {
+  ownerRecommendList.innerHTML = `
+    <div class="dashboard-empty-state">
+      <strong>Chưa có Recommend nào.</strong>
+      <span>Lời giới thiệu từ người dùng sẽ xuất hiện ở đây.</span>
+    </div>
+  `;
+  return;
+}
   ownerRecommendList.innerHTML =
   recommendations.map(item => {
 
@@ -1229,12 +1243,27 @@ async function renderOwnerRecommendations() {
 async function renderOwnerFeedback() {
   if (!ownerFeedbackList) return;
 
-  const feedbacks = await loadOwnerFeedback();
+ const feedbacks = await loadOwnerFeedback();
 
-  if (!feedbacks.length) {
-    ownerFeedbackList.innerHTML = "<p>Chưa có Feedback nào.</p>";
-    return;
-  }
+if (feedbacks === null) {
+  ownerFeedbackList.innerHTML = `
+    <div class="dashboard-empty-state dashboard-error-state">
+      <strong>Không thể tải Feedback.</strong>
+      <span>Vui lòng thử lại sau.</span>
+    </div>
+  `;
+  return;
+}
+
+if (feedbacks.length === 0) {
+  ownerFeedbackList.innerHTML = `
+    <div class="dashboard-empty-state">
+      <strong>Chưa có Feedback nào.</strong>
+      <span>Feedback từ người dùng sẽ xuất hiện ở đây.</span>
+    </div>
+  `;
+  return;
+}
 
   ownerFeedbackList.innerHTML =
   feedbacks.map(item => {
