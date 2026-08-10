@@ -1022,7 +1022,7 @@ async function loadOwnerFeedback() {
     error: profileError
   } = await supabaseClient
     .from("profiles")
-    .select("id, username, email")
+    .select("id, username, email, avatar_url")
     .in("id", userIds);
 
   if (profileError) {
