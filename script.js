@@ -532,34 +532,29 @@ supabaseClient
   ]);
 
 
-  if (journeyResult.error) {
-    console.error(
-      "Dashboard Journey count error:",
-      journeyResult.error
-    );
-  }
+if (
+  journeyResult.error ||
+  commentResult.error ||
+  feedbackResult.error ||
+  recommendResult.error
+) {
+  console.error(
+    "Dashboard Stats error:",
+    {
+      journey: journeyResult.error,
+      comments: commentResult.error,
+      feedback: feedbackResult.error,
+      recommendations: recommendResult.error
+    }
+  );
 
-  if (commentResult.error) {
-    console.error(
-      "Dashboard Comment count error:",
-      commentResult.error
-    );
-  }
+  showAuthToast(
+    "Không thể tải thống kê Dashboard.",
+    "error"
+  );
 
-  if (feedbackResult.error) {
-    console.error(
-      "Dashboard Feedback count error:",
-      feedbackResult.error
-    );
-  }
-
-  if (recommendResult.error) {
-    console.error(
-      "Dashboard Recommend count error:",
-      recommendResult.error
-    );
-  }
-
+  return;
+}
 
   if (dashboardJourneyCount) {
     dashboardJourneyCount.textContent =
@@ -4442,6 +4437,9 @@ openJourney?.addEventListener(
       "aria-hidden",
       "false"
     );
+    setTimeout(() => {
+  closeJourneyModal?.focus();
+}, 50);
 
   }
 );
