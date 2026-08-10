@@ -439,9 +439,9 @@ document.querySelectorAll(".settings-tab").forEach(button => {
 
     button.classList.add("active");
     const panel = document.getElementById(button.dataset.panel);
-    if (
+if (
   button.dataset.panel === "dashboard" &&
-  currentUserRole === "owner"
+  (currentUserRole === "user" || currentUserRole === "owner")
 ) {
   loadDashboardStats();
 }
@@ -481,46 +481,67 @@ const dashboardRecommendCount =
   document.getElementById(
     "dashboardRecommendCount"
   );
-  async function loadDashboardStats() {
+async function loadDashboardStats() {
 
-  if (currentUserRole !== "owner") {
+  if (
+    currentUserRole !== "user" &&
+    currentUserRole !== "owner"
+  ) {
     return;
   }
 
+  const session = await getSession();
 
-const [
-  journeyResult,
-  likeResult,
-  commentResult,
-  feedbackResult,
-  recommendResult
-] = await Promise.all([
+  if (!session) {
+    return;
+  }
+
+  const userId = session.user.id;
+  const isOwner = currentUserRole === "owner";
+
+  const [
+    journeyResult,
+    likeResult,
+    commentResult,
+    feedbackResult,
+    recommendResult
+  ] = await Promise.all([
+
+    isOwner
+      ? supabaseClient
+          .from("journey_images")
+          .select("id", {
+            count: "exact",
+            head: true
+          })
+      : Promise.resolve({
+          count: null,
+          error: null
+        }),
 
     supabaseClient
-      .from("journey_images")
+      .from("journey_likes")
       .select("id", {
         count: "exact",
         head: true
-      }),
-supabaseClient
-  .from("journey_likes")
-  .select("id", {
-    count: "exact",
-    head: true
-  }),
+      })
+      .eq("user_id", userId),
+
     supabaseClient
       .from("journey_comments")
       .select("id", {
         count: "exact",
         head: true
-      }),
+      })
+      .eq("user_id", userId),
 
     supabaseClient
       .from("feedback")
       .select("id", {
         count: "exact",
         head: true
-      }),
+      })
+      .eq("user_id", userId),
 
     supabaseClient
       .from("recommendations")
@@ -528,60 +549,71 @@ supabaseClient
         count: "exact",
         head: true
       })
+      .eq("user_id", userId)
 
   ]);
 
+  if (
+    journeyResult.error ||
+    likeResult.error ||
+    commentResult.error ||
+    feedbackResult.error ||
+    recommendResult.error
+  ) {
 
-if (
-  journeyResult.error ||
-  commentResult.error ||
-  feedbackResult.error ||
-  recommendResult.error
-) {
-  console.error(
-    "Dashboard Stats error:",
-    {
-      journey: journeyResult.error,
-      comments: commentResult.error,
-      feedback: feedbackResult.error,
-      recommendations: recommendResult.error
-    }
-  );
+    console.error(
+      "Personal Dashboard Stats error:",
+      {
+        journey: journeyResult.error,
+        likes: likeResult.error,
+        comments: commentResult.error,
+        feedback: feedbackResult.error,
+        recommendations: recommendResult.error
+      }
+    );
 
-  showAuthToast(
-    "Không thể tải thống kê Dashboard.",
-    "error"
-  );
+    showAuthToast(
+      "Không thể tải thống kê Dashboard.",
+      "error"
+    );
 
-  return;
-}
+    return;
+  }
 
+  /*
+   * Journey
+   * Owner  → tổng Journey
+   * User   → —
+   */
   if (dashboardJourneyCount) {
     dashboardJourneyCount.textContent =
-      journeyResult.count ?? 0;
+      isOwner
+        ? (journeyResult.count ?? 0)
+        : "—";
   }
-if (dashboardLikeCount) {
-  dashboardLikeCount.textContent =
-    likeResult.count ?? 0;
-}
+
+  /*
+   * User / Owner personal activity
+   */
+  if (dashboardLikeCount) {
+    dashboardLikeCount.textContent =
+      likeResult.count ?? 0;
+  }
 
   if (dashboardCommentCount) {
     dashboardCommentCount.textContent =
       commentResult.count ?? 0;
   }
 
-
   if (dashboardFeedbackCount) {
     dashboardFeedbackCount.textContent =
       feedbackResult.count ?? 0;
   }
 
-
   if (dashboardRecommendCount) {
     dashboardRecommendCount.textContent =
       recommendResult.count ?? 0;
   }
-
 }
 function updateFeedback() {
   const length = feedbackInput.value.trim().length;
@@ -896,10 +928,10 @@ function applyRoleUI(role) {
 
   const isOwner = currentUserRole === "owner";
   const isUser = currentUserRole === "user";
-  if (dashboardTab) {
-  dashboardTab.hidden = !isOwner;
-  }
-if (isOwner) {
+if (dashboardTab) {
+  dashboardTab.hidden = role === "visitor";
+}
+if (isUser || isOwner) {
   renderOwnerFeedback();
   renderOwnerRecommendations();
   loadDashboardStats();
@@ -996,14 +1028,23 @@ async function refreshAccountUI() {
 }
 async function loadOwnerFeedback() {
 
-  if (currentUserRole !== "owner") {
+  if (
+    currentUserRole !== "user" &&
+    currentUserRole !== "owner"
+  ) {
     return [];
   }
 
-  const {
-    data,
-    error
-  } = await supabaseClient
+  const session = await getSession();
+
+  if (!session) {
+    return [];
+  }
+
+  const isOwner =
+    currentUserRole === "owner";
+
+  let query = supabaseClient
     .from("feedback")
     .select(
       "id, user_id, message, created_at"
@@ -1013,10 +1054,25 @@ async function loadOwnerFeedback() {
       { ascending: false }
     );
 
-if (error) {
-  console.error("Owner Feedback load error:", error);
-  return null;
-}
+  if (!isOwner) {
+    query = query
+      .eq("user_id", session.user.id)
+      .limit(5);
+  }
+
+  const {
+    data,
+    error
+  } = await query;
+
+  if (error) {
+    console.error(
+      "Feedback load error:",
+      error
+    );
+
+    return null;
+  }
 
   const feedbacks = data || [];
 
@@ -1041,7 +1097,9 @@ if (error) {
     error: profileError
   } = await supabaseClient
     .from("profiles")
-    .select("id, username, email, avatar_url")
+    .select(
+      "id, username, email, avatar_url"
+    )
     .in("id", userIds);
 
   if (profileError) {
@@ -1053,12 +1111,13 @@ if (error) {
     return feedbacks;
   }
 
-  const profileMap = new Map(
-    (profiles || []).map(profile => [
-      profile.id,
-      profile
-    ])
-  );
+  const profileMap =
+    new Map(
+      (profiles || []).map(profile => [
+        profile.id,
+        profile
+      ])
+    );
 
   return feedbacks.map(item => ({
     ...item,
@@ -1068,14 +1127,23 @@ if (error) {
 }
 async function loadOwnerRecommendations() {
 
-  if (currentUserRole !== "owner") {
+  if (
+    currentUserRole !== "user" &&
+    currentUserRole !== "owner"
+  ) {
     return [];
   }
 
-  const {
-    data,
-    error
-  } = await supabaseClient
+  const session = await getSession();
+
+  if (!session) {
+    return [];
+  }
+
+  const isOwner =
+    currentUserRole === "owner";
+
+  let query = supabaseClient
     .from("recommendations")
     .select(
       "id, user_id, book, media, story, explanation, created_at"
@@ -1085,12 +1153,28 @@ async function loadOwnerRecommendations() {
       { ascending: false }
     );
 
-if (error) {
-  console.error("Owner Recommend load error:", error);
-  return null;
-}
+  if (!isOwner) {
+    query = query
+      .eq("user_id", session.user.id)
+      .limit(5);
+  }
 
-  const recommendations = data || [];
+  const {
+    data,
+    error
+  } = await query;
+
+  if (error) {
+    console.error(
+      "Recommend load error:",
+      error
+    );
+
+    return null;
+  }
+
+  const recommendations =
+    data || [];
 
   if (!recommendations.length) {
     return [];
@@ -1113,7 +1197,9 @@ if (error) {
     error: profileError
   } = await supabaseClient
     .from("profiles")
-    .select("id, username, email, avatar_url")
+    .select(
+      "id, username, email, avatar_url"
+    )
     .in("id", userIds);
 
   if (profileError) {
@@ -1125,12 +1211,13 @@ if (error) {
     return recommendations;
   }
 
-  const profileMap = new Map(
-    (profiles || []).map(profile => [
-      profile.id,
-      profile
-    ])
-  );
+  const profileMap =
+    new Map(
+      (profiles || []).map(profile => [
+        profile.id,
+        profile
+      ])
+    );
 
   return recommendations.map(item => ({
     ...item,

@@ -2895,3 +2895,12 @@ select:focus-visible {
     transition-duration: 0.01ms !important;
   }
 }
+/* ==========================================
+   MOBILE — HERO AVATAR EDIT
+========================================== */
+
+@media (hover: none) and (pointer: coarse) {
+  .avatar-ring .change-avatar-button:not([hidden]) {
+    opacity: 1;
+  }
+}
