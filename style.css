@@ -2765,3 +2765,19 @@ body.dark {
   }
 
 }
+.journey-comment-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.journey-comment-avatar {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  min-height: 28px;
+  max-width: 28px;
+  max-height: 28px;
+  object-fit: cover;
+  border-radius: 50%;
+}
