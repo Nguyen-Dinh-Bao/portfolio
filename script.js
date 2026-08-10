@@ -1235,7 +1235,11 @@ async function renderOwnerFeedback() {
 
   }).join("");
 }
-function validateAccountInput(username, email, password) {
+function validateAccountInput(
+  username,
+  bio,
+  password
+) {
 
   if (!username) {
     return "Username không được để trống.";
@@ -1245,140 +1249,266 @@ function validateAccountInput(username, email, password) {
     return "Username chỉ được gồm chữ, số, dấu _, dấu . hoặc dấu - và dài 3–30 ký tự.";
   }
 
-  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return "Gmail chưa đúng định dạng.";
+  if (bio.length > 300) {
+    return "Bio không được vượt quá 300 ký tự.";
   }
 
-  if (password && password.length < 6) {
+  if (password && password.trim().length < 6) {
     return "Password phải có ít nhất 6 ký tự.";
   }
 
   return null;
 }
-saveAccount?.addEventListener("click", async () => {
-  const session=await getSession();
-  if (!session) return showAuthToast("Hãy đăng nhập trước khi chỉnh sửa Account.","error");
-  const username=accountUsername.value.trim(), email=accountEmail.value.trim(), bio=accountBio.value.trim(), pw=accountPassword.value;
-  const validationError =
-  validateAccountInput(
-    username,
-    email,
-    pw
-  );
 
-if (validationError) {
-  return showAuthToast(
-    validationError,
+
+function setAccountSavingState(isSaving) {
+
+  if (!saveAccount) return;
+
+  saveAccount.disabled = isSaving;
+
+  if (isSaving) {
+
+    saveAccount.dataset.originalText =
+      saveAccount.innerHTML;
+
+    saveAccount.innerHTML =
+      "Đang lưu...";
+
+  } else {
+
+    saveAccount.innerHTML =
+      saveAccount.dataset.originalText ||
+      "Lưu thay đổi <span>↗</span>";
+
+  }
+}
+
+
+function accountSaveError(message) {
+
+  setAccountSavingState(false);
+
+  showAuthToast(
+    message,
     "error"
   );
 }
-  const {data: dup,error:dupErr}=await supabaseClient.from("profiles").select("id").eq("username",username).neq("id",session.user.id).maybeSingle();
-  if (dupErr) return showAuthToast("Không thể kiểm tra Username.","error");
-  if (dup) return showAuthToast("Username đã được sử dụng","error");
- const { data: updated, error } = await supabaseClient
-  .from("profiles")
-  .update({
-    username,
-    bio
-  })
-  .eq("id", session.user.id)
-  .select("id,username,email,bio,avatar_url,role")
-  .single();
-  if (error) { console.error(error); return showAuthToast("Không thể lưu thông tin Account.","error"); }
-let emailChangeRequested = false;
 
-if (
-  email &&
-  email.toLowerCase() !==
-    (session.user.email || "").toLowerCase()
-) {
 
-  const {
-    error: emailError
-  } = await supabaseClient.auth.updateUser({
-    email: email
-  });
+saveAccount?.addEventListener("click", async () => {
 
-  if (emailError) {
+  if (saveAccount.disabled) return;
+
+  setAccountSavingState(true);
+
+  try {
+
+    const session =
+      await getSession();
+
+    if (!session) {
+      accountSaveError(
+        "Hãy đăng nhập trước khi chỉnh sửa Account."
+      );
+      return;
+    }
+
+
+    const username =
+      accountUsername.value.trim();
+
+    const bio =
+      accountBio.value.trim();
+
+    const pw =
+      accountPassword.value;
+
+
+    const validationError =
+      validateAccountInput(
+        username,
+        bio,
+        pw
+      );
+
+
+    if (validationError) {
+
+      accountSaveError(
+        validationError
+      );
+
+      return;
+    }
+
+
+    /*
+     * CHECK USERNAME TRÙNG
+     */
+
+    const {
+      data: dup,
+      error: dupErr
+    } = await supabaseClient
+      .from("profiles")
+      .select("id")
+      .eq("username", username)
+      .neq("id", session.user.id)
+      .maybeSingle();
+
+
+    if (dupErr) {
+
+      console.error(
+        "Username check error:",
+        dupErr
+      );
+
+      accountSaveError(
+        "Không thể kiểm tra Username."
+      );
+
+      return;
+    }
+
+
+    if (dup) {
+
+      accountSaveError(
+        "Username đã được sử dụng."
+      );
+
+      return;
+    }
+
+
+    /*
+     * UPDATE USERNAME + BIO
+     */
+
+    const {
+      data: updated,
+      error
+    } = await supabaseClient
+      .from("profiles")
+      .update({
+        username,
+        bio
+      })
+      .eq("id", session.user.id)
+      .select(
+        "id,username,email,bio,avatar_url,role"
+      )
+      .single();
+
+
+    if (error) {
+
+      console.error(
+        "Account update error:",
+        error
+      );
+
+      accountSaveError(
+        "Không thể lưu thông tin Account."
+      );
+
+      return;
+    }
+
+
+    /*
+     * UPDATE PASSWORD
+     */
+
+    let passwordChanged = false;
+
+
+    if (pw) {
+
+      const {
+        error: passwordError
+      } = await supabaseClient.auth.updateUser({
+        password: pw
+      });
+
+
+      if (passwordError) {
+
+        console.error(
+          "Password update error:",
+          passwordError
+        );
+
+        accountSaveError(
+          `Không thể đổi Password: ${
+            passwordError.message ||
+            "Lỗi không xác định."
+          }`
+        );
+
+        return;
+      }
+
+      passwordChanged = true;
+    }
+
+
+    /*
+     * REFRESH ACCOUNT UI
+     */
+
+    renderSignedInAccount(updated);
+
+    await refreshAccountUI();
+
+    await updatePermissionUI();
+
+
+    /*
+     * SUCCESS
+     */
+
+    if (passwordChanged) {
+
+      showAuthToast(
+        "Username, Bio và Password đã được cập nhật.",
+        "success"
+      );
+
+    } else {
+
+      showAuthToast(
+        "Username và Bio đã được cập nhật.",
+        "success"
+      );
+
+    }
+
+
+  } catch (error) {
 
     console.error(
-      "Email update error:",
-      emailError
+      "Unexpected Account error:",
+      error
     );
 
-    return showAuthToast(
-      `Không thể đổi Email: ${
-        emailError.message ||
-        "Lỗi không xác định."
-      }`,
+    showAuthToast(
+      "Đã xảy ra lỗi khi cập nhật Account.",
       "error"
     );
+
+  } finally {
+
+    /*
+     * LUÔN TRẢ NÚT SAVE VỀ TRẠNG THÁI BÌNH THƯỜNG
+     */
+
+    setAccountSavingState(false);
+
   }
 
-  emailChangeRequested = true;
-}
-let passwordChanged = false;
-
-if (pw) {
-
-  const {
-    error: passwordError
-  } = await supabaseClient.auth.updateUser({
-    password: pw
-  });
-
-  if (passwordError) {
-
-    console.error(
-      "Password update error:",
-      passwordError
-    );
-
-    return showAuthToast(
-      `Không thể đổi Password: ${
-        passwordError.message ||
-        "Lỗi không xác định."
-      }`,
-      "error"
-    );
-  }
-
-  passwordChanged = true;
-}
-  renderSignedInAccount({
-  ...updated,
-  email: email
-}); await refreshAccountUI();
-await updatePermissionUI();
-if (emailChangeRequested && passwordChanged) {
-
-  showAuthToast(
-    "Account đã cập nhật. Email mới cần được xác nhận qua Gmail.",
-    "success"
-  );
-
-} else if (emailChangeRequested) {
-
-  showAuthToast(
-    "Username đã cập nhật. Email mới cần được xác nhận qua Gmail.",
-    "success"
-  );
-
-} else if (passwordChanged) {
-
-  showAuthToast(
-    "Username và Password đã được cập nhật.",
-    "success"
-  );
-
-} else {
-
-  showAuthToast(
-    "Đã cập nhật Account.",
-    "success"
-  );
-
-}
 });
 resetAccount?.addEventListener("click",async()=>{renderSignedInAccount(await getCurrentProfile());});
 passwordToggle?.addEventListener("click",()=>{const h=accountPassword.type==="password";accountPassword.type=h?"text":"password";passwordToggle.textContent=h?"○":"◉";});
