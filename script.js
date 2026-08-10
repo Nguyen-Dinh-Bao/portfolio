@@ -1210,15 +1210,32 @@ async function renderOwnerFeedback() {
     return `
       <article class="feedback-box">
 
-        <div class="feedback-user">
-          <strong>
-            ${escapeHTML(username)}
-          </strong>
+<div class="feedback-user">
 
-          <small>
-            ${escapeHTML(email)}
-          </small>
-        </div>
+  <img
+    class="dashboard-feedback-avatar"
+    src="${escapeHTML(
+      profile.avatar_url ||
+      "assets/profile.jpg"
+    )}"
+    alt="${escapeHTML(username)} avatar"
+    loading="lazy"
+    onerror="this.onerror=null;this.src='assets/profile.jpg';"
+  >
+
+  <div class="feedback-user-info">
+
+    <strong>
+      ${escapeHTML(username)}
+    </strong>
+
+    <small>
+      ${escapeHTML(email)}
+    </small>
+
+  </div>
+
+</div>
 
         <p>
           ${escapeHTML(item.message)}
