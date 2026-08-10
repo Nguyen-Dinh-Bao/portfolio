@@ -507,17 +507,121 @@ async function loadDashboardStats() {
     recommendResult
   ] = await Promise.all([
 
-    isOwner
-      ? supabaseClient
-          .from("journey_images")
-          .select("id", {
-            count: "exact",
-            head: true
-          })
-      : Promise.resolve({
-          count: null,
-          error: null
-        }),
+    // Journey
+    supabaseClient
+      .from("journey_images")
+      .select("id", {
+        count: "exact",
+        head: true
+      }),
+
+    // Likes
+    supabaseClient
+      .from("journey_likes")
+      .select("id", {
+        count: "exact",
+        head: true
+      }),
+
+    // Comments
+    supabaseClient
+      .from("journey_comments")
+      .select("id", {
+        count: "exact",
+        head: true
+      }),
+
+    // Feedback
+    supabaseClient
+      .from("feedback")
+      .select("id", {
+        count: "exact",
+        head: true
+      }),
+
+    // Recommendations
+    supabaseClient
+      .from("recommendations")
+      .select("id", {
+        count: "exact",
+        head: true
+      })
+
+  ]);
+
+  if (
+    journeyResult.error ||
+    likeResult.error ||
+    commentResult.error ||
+    feedbackResult.error ||
+    recommendResult.error
+  ) {
+
+    console.error(
+      "Dashboard Stats error:",
+      {
+        journey: journeyResult.error,
+        likes: likeResult.error,
+        comments: commentResult.error,
+        feedback: feedbackResult.error,
+        recommendations: recommendResult.error
+      }
+    );
+
+    showAuthToast(
+      "Không thể tải thống kê Dashboard.",
+      "error"
+    );
+
+    return;
+  }
+
+  /*
+   * OWNER
+   * → Tất cả statistics là TOTAL
+   */
+  if (isOwner) {
+
+    if (dashboardJourneyCount) {
+      dashboardJourneyCount.textContent =
+        journeyResult.count ?? 0;
+    }
+
+    if (dashboardLikeCount) {
+      dashboardLikeCount.textContent =
+        likeResult.count ?? 0;
+    }
+
+    if (dashboardCommentCount) {
+      dashboardCommentCount.textContent =
+        commentResult.count ?? 0;
+    }
+
+    if (dashboardFeedbackCount) {
+      dashboardFeedbackCount.textContent =
+        feedbackResult.count ?? 0;
+    }
+
+    if (dashboardRecommendCount) {
+      dashboardRecommendCount.textContent =
+        recommendResult.count ?? 0;
+    }
+
+    return;
+  }
+
+  /*
+   * USER
+   * → Journey = —
+   * → các statistic còn lại phải là của chính User
+   */
+
+  const [
+    personalLikeResult,
+    personalCommentResult,
+    personalFeedbackResult,
+    personalRecommendResult
+  ] = await Promise.all([
 
     supabaseClient
       .from("journey_likes")
@@ -554,65 +658,53 @@ async function loadDashboardStats() {
   ]);
 
   if (
-    journeyResult.error ||
-    likeResult.error ||
-    commentResult.error ||
-    feedbackResult.error ||
-    recommendResult.error
+    personalLikeResult.error ||
+    personalCommentResult.error ||
+    personalFeedbackResult.error ||
+    personalRecommendResult.error
   ) {
 
     console.error(
       "Personal Dashboard Stats error:",
       {
-        journey: journeyResult.error,
-        likes: likeResult.error,
-        comments: commentResult.error,
-        feedback: feedbackResult.error,
-        recommendations: recommendResult.error
+        likes: personalLikeResult.error,
+        comments: personalCommentResult.error,
+        feedback: personalFeedbackResult.error,
+        recommendations:
+          personalRecommendResult.error
       }
     );
 
     showAuthToast(
-      "Không thể tải thống kê Dashboard.",
+      "Không thể tải thống kê cá nhân.",
       "error"
     );
 
     return;
   }
 
-  /*
-   * Journey
-   * Owner  → tổng Journey
-   * User   → —
-   */
   if (dashboardJourneyCount) {
-    dashboardJourneyCount.textContent =
-      isOwner
-        ? (journeyResult.count ?? 0)
-        : "—";
+    dashboardJourneyCount.textContent = "—";
   }
 
-  /*
-   * User / Owner personal activity
-   */
   if (dashboardLikeCount) {
     dashboardLikeCount.textContent =
-      likeResult.count ?? 0;
+      personalLikeResult.count ?? 0;
   }
 
   if (dashboardCommentCount) {
     dashboardCommentCount.textContent =
-      commentResult.count ?? 0;
+      personalCommentResult.count ?? 0;
   }
 
   if (dashboardFeedbackCount) {
     dashboardFeedbackCount.textContent =
-      feedbackResult.count ?? 0;
+      personalFeedbackResult.count ?? 0;
   }
 
   if (dashboardRecommendCount) {
     dashboardRecommendCount.textContent =
-      recommendResult.count ?? 0;
+      personalRecommendResult.count ?? 0;
   }
 }
 function updateFeedback() {
@@ -821,17 +913,17 @@ async function updatePortfolio(fields) {
 }
 /* ---------- Portfolio Avatar Upload ---------- */
 
-changePortfolioAvatar?.addEventListener("click", async () => {
+changePortfolioAvatar?.addEventListener("click", () => {
 
-    const profile = await getCurrentProfile();
-
-    if (!profile || profile.role !== "owner") {
-        showAuthToast("Chỉ Owner mới có thể thay đổi ảnh Portfolio.", "error");
+    if (currentUserRole !== "owner") {
+        showAuthToast(
+            "Chỉ Owner mới có thể thay đổi ảnh Portfolio.",
+            "error"
+        );
         return;
     }
 
-    portfolioAvatarInput.click();
-
+    portfolioAvatarInput?.click();
 });
 
 portfolioAvatarInput?.addEventListener("change", async () => {
