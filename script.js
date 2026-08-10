@@ -2757,9 +2757,11 @@ async function loadJourneyComments(journeyId) {
     article.className =
       "journey-comment";
 
-    const username =
-      profilesMap[comment.user_id] ||
-      "User";
+const profile =
+  profilesMap[comment.user_id] || {};
+
+const username =
+  profile.username || "User";
 
     const canEdit =
       currentUserId === comment.user_id;
