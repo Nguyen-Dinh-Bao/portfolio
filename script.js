@@ -2772,19 +2772,34 @@ const username =
 
     article.innerHTML = `
 
-      <div class="journey-comment-content">
+<div class="journey-comment-content">
 
-        <span class="journey-comment-author">
-          ${escapeHTML(username)}
-        </span>
+  <div class="journey-comment-user">
 
-        <span class="journey-comment-text">
-          ${escapeHTML(
-            comment.content || ""
-          )}
-        </span>
+    <img
+      class="journey-comment-avatar"
+      src="${escapeHTML(
+        profile.avatar_url ||
+        "assets/profile.jpg"
+      )}"
+      alt="${escapeHTML(username)} avatar"
+      loading="lazy"
+      onerror="this.onerror=null;this.src='assets/profile.jpg';"
+    >
 
-      </div>
+    <span class="journey-comment-author">
+      ${escapeHTML(username)}
+    </span>
+
+  </div>
+
+  <span class="journey-comment-text">
+    ${escapeHTML(
+      comment.content || ""
+    )}
+  </span>
+
+</div>
 
       ${
         canEdit || canDelete
