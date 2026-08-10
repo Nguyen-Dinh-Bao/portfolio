@@ -383,19 +383,43 @@ navLinks.querySelectorAll("a").forEach(link => {
 const sections = [...document.querySelectorAll("main section[id]")];
 const navItems = [...document.querySelectorAll(".nav-link")];
 
-const navObserver = new IntersectionObserver((entries) => {
-  const visible = entries
-    .filter(entry => entry.isIntersecting)
-    .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+function updateActiveNav() {
+  const scrollPosition =
+    window.scrollY + window.innerHeight * 0.25;
 
-  if (!visible) return;
+  let currentSection = sections[0];
+
+  sections.forEach(section => {
+    const sectionTop =
+      section.offsetTop;
+
+    if (sectionTop <= scrollPosition) {
+      currentSection = section;
+    }
+  });
+
+  if (!currentSection) return;
 
   navItems.forEach(item => {
-    item.classList.toggle("active", item.getAttribute("href") === `#${visible.target.id}`);
+    item.classList.toggle(
+      "active",
+      item.getAttribute("href") === `#${currentSection.id}`
+    );
   });
-}, { threshold: [0.2, 0.5, 0.8] });
+}
 
-sections.forEach(section => navObserver.observe(section));
+window.addEventListener(
+  "scroll",
+  updateActiveNav,
+  { passive: true }
+);
+
+window.addEventListener(
+  "resize",
+  updateActiveNav
+);
+
+updateActiveNav();
 
 const revealObserver = new IntersectionObserver((entries, observer) => {
   entries.forEach(entry => {
