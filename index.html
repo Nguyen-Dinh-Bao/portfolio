@@ -10,6 +10,11 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script
+  src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+  async
+  defer>
+</script>
 </head>
 <body>
   <div class="page-progress" id="pageProgress"></div>
@@ -861,6 +866,11 @@
         </label>
 
         <p id="authHint" class="auth-hint">Đăng nhập bằng Username hoặc Gmail đã lưu trong tài khoản.</p>
+<div
+  class="cf-turnstile auth-signup-only"
+  data-sitekey="0x4AAAAAAEPsYEegv0Y5xNQI"
+  data-action="signup">
+</div>
         <button id="authSubmit" class="dark-button auth-submit" type="submit">Sign In <span>↗</span></button>
       </form>
     </div>

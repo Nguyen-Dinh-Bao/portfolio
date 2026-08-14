@@ -2403,6 +2403,55 @@ authForm.addEventListener("submit",async e=>{
     if(!/^[A-Za-z0-9_.-]{3,30}$/.test(identity))return showAuthToast("Username không hợp lệ.","error");
     if(password.length<6)return showAuthToast("Password phải có ít nhất 6 ký tự.","error");
     if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()))return showAuthToast("Gmail chưa đúng định dạng.","error");
+    const turnstileToken =
+  authForm.querySelector(
+    'input[name="cf-turnstile-response"]'
+  )?.value;
+
+if (!turnstileToken) {
+  return showAuthToast(
+    "Vui lòng hoàn thành Cloudflare Turnstile.",
+    "error"
+  );
+}
+
+let turnstileVerification;
+
+try {
+  const response = await fetch(
+    "https://contactkinz-turnstile-api.peterschrodinger0909.workers.dev/",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        token: turnstileToken
+      })
+    }
+  );
+
+  turnstileVerification =
+    await response.json();
+
+} catch (error) {
+  console.error(
+    "Turnstile Worker error:",
+    error
+  );
+
+  return showAuthToast(
+    "Không thể xác minh bảo mật. Vui lòng thử lại.",
+    "error"
+  );
+}
+
+if (!turnstileVerification?.success) {
+  return showAuthToast(
+    "Xác minh Cloudflare thất bại. Vui lòng thử lại.",
+    "error"
+  );
+}
     const {data,error}=await supabaseClient.auth.signUp({
     email:email.trim(),
     password,
